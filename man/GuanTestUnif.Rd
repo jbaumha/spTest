@@ -4,9 +4,9 @@
 \alias{GuanTestUnif}
 \title{Nonparametric Test of Isotropy Using the Sample Semivariogram}
 \usage{
-GuanTestUnif(spdata, lagmat, A, df, subblock.dims, h = 1, kernel = "norm",
-  truncation = 1.5, xlims, ylims, grid.spacing = 1, subblock.h,
-  sig.est.finite = T)
+GuanTestUnif(spdata, lagmat, A, df, h = 1, kernel = "norm",
+  truncation = 1.5, xlims, ylims, grid.spacing = c(1, 1),
+  window.dims = c(2, 2), subblock.h, sig.est.finite = T)
 }
 \arguments{
 \item{spdata}{An \eqn{n} by \eqn{3} matrix. The first two columns provide \eqn{(x,y)} spatial coordinates. The third column provides data values at the coordinates.}
@@ -16,8 +16,6 @@ GuanTestUnif(spdata, lagmat, A, df, subblock.dims, h = 1, kernel = "norm",
 \item{A}{A \eqn{d} by \eqn{k} contrast matrix. The contrasts correspond to contrasts of the estimated semivariogram at the lags given in 'lagmat'.}
 
 \item{df}{A scalar indicating the row rank of A. This value gives the degrees of freedom for the asymptotic Chi-sq distribution used to compute the p-value.}
-
-\item{subblock.dims}{A vector of length two corresponding to the width and height of the moving windows used to estimate the asymptotic variance-covariance matrix. If window width does not evenly divide the width of the sampling region, some data will be ommited during subsampling, i.e., function does not handle partial windows. Same applies to window height and height of sampling region.}
 
 \item{h}{A scalar giving the bandwidth for the kernel smoother. The same bandwidth is used for lags in both the x and y directions.}
 
@@ -29,7 +27,9 @@ GuanTestUnif(spdata, lagmat, A, df, subblock.dims, h = 1, kernel = "norm",
 
 \item{ylims}{A vector of length two providing the lower and upper y-limits of the sampling region.}
 
-\item{grid.spacing}{A scalar indicating the spacing of the underlying grid laid on the sampling region to create moving windows. The same spacing is used in the x and y directions.}
+\item{grid.spacing}{A vector of length two providing the x (width) and y (height) spacing, respectively, of the underlying grid laid on the sampling region to create moving windows. If the grid spacing width does not evenly divide the width of the sampling region, some data will be ommited during subsampling, i.e., the function does not handle partial windows. Same applies to grid spacing height and height of sampling region. See details for an example.}
+
+\item{window.dims}{A vector of length two corresponding to the width and height of the moving windows used to estimate the asymptotic variance-covariance matrix. The dimensions are given in terms of the spacing of the grid laid on the sampling region. See details for an example.}
 
 \item{subblock.h}{A scalar giving the bandwidth used for the kernel smoother when estimating the semivariogram on the moving windows (blocks). It is recommended to be less than 1 to maintain nominal test size.}
 
@@ -42,15 +42,16 @@ GuanTestUnif(spdata, lagmat, A, df, subblock.dims, h = 1, kernel = "norm",
 \item{test.stat}{The calculated test statistic.}
 \item{pvalue.finite}{The approximate, finite-sample adjusted p-value computed by using the moving windows (see Guan et. al. (2004), Section 3.3 for details).}
 \item{pvalue.chisq}{The p-value computed using the asymptotic Chi-sq distribution.}
-\item{h.sb}{The value of h (bandwidth) used to estimate the semivariogram on the moving windows (blocks).}
 }
 \description{
 This function performs the nonparametric test of isotropy from Guan et. al. (2004) for spatial data with uniformly distributed sampling locations. See Guan et. al. (2004) for more details.
 }
 \details{
-This function currently only supports square and rectangular sampling regions and does not currently support partial blocks. For example, suppose the sampling region runs from 0 to 20 in the x-direction and from 0 to 30 in the y-direction and an underlying grid of 1 by 1 is laid over the sampling region. Then an ideal value of subblock.dims would be (2,3) since its entries evenly divide the width (20) and height (30), respectively, of the sampling region. Using the vector (3, 4.5) would imply that some data will not be used in the moving windows since these values would create partial blocks in the sampling region.
+This function currently only supports square and rectangular sampling regions and does not support partial blocks. For example, suppose the sampling region runs from 0 to 20 in the x-direction and from 0 to 30 in the y-direction and an underlying grid of 1 by 1 is laid over the sampling region. Then an ideal value of window.dims would be (2,3) since its entries evenly divide the width (20) and height (30), respectively, of the sampling region. Using the vector (3, 4.5) would imply that some data will not be used in the moving windows since these values would create partial blocks in the sampling region.
 
-To preserve the spatial dependence structure, the spatial blocks should have the same shape (i.e. square or rectangle) and orientation as the entire sampling domain.
+The value window.dims provides the width and height of the moving window in terms of the underlying grid laid on the sampling region. For example, if a grid with dimensions of grid.spacing = c(0.1, 0.2) is laid on the sampling region and window.dims = c(2,3) then the dimensions of the subblocks created by the moving windows are (0.2, 0.6). Thus, the user must take care to ensure that the values of grid.spacing and window.dims are compatible with the dimensions of the sampling region.
+
+To preserve the spatial dependence structure, the moving window should have the same shape (i.e. square or rectangle) and orientation as the entire sampling domain.
 }
 \examples{
 library(mvtnorm)
@@ -73,13 +74,14 @@ z <- t(z)
 mydata <- cbind(coords, z)
 mylags = rbind(c(1,0), c(0, 1), c(1, 1), c(-1,1))
 myA = rbind(c(1, -1, 0 , 0), c(0, 0, 1, -1))
-mysb.dims = c(4,4)
+my.grid = c(1,1)
+my.windims = c(4,4)
 myh = 0.7
 myh.sb = 0.8
 my.xlims = c(0, 20)
 my.ylims = c(0, 20)
-tr <- GuanTestUnif(mydata, mylags, myA, df = 2, mysb.dims, myh, "norm", 1.5,
- my.xlims, my.ylims, 1, myh.sb)
+tr <- GuanTestUnif(mydata, mylags, myA, df = 2, myh, "norm", 1.5,
+ my.xlims, my.ylims, my.grid,my.windims, myh.sb)
 tr
 
 #Simulate data from anisotropic covariance function
@@ -94,8 +96,8 @@ z <-  z-mean(z)
 z <- t(z)
 mydata <- cbind(coords, z)
 #Run the test on the data generated from an anisotropic covariance function
-tr <- GuanTestUnif(mydata, mylags, myA, df = 2, mysb.dims, myh, "norm", 1.5,
-my.xlims, my.ylims, 1, myh.sb)
+tr <- GuanTestUnif(mydata, mylags, myA, df = 2, myh, "norm", 1.5,
+ my.xlims, my.ylims, my.grid,my.windims, myh.sb)
 tr
 }
 \references{

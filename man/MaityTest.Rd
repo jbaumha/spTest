@@ -4,8 +4,9 @@
 \alias{MaityTest}
 \title{Nonparametric Test of Isotropy Using the Sample Covariogram}
 \usage{
-MaityTest(spdata, lagmat, A, df, subblock.dims, xlims, ylims, nBoot = 100,
-  grid = c(1, 1), kappa = 1, user.bandwidth = F, bandwidth = c(1, 1))
+MaityTest(spdata, lagmat, A, df, xlims, ylims, grid.spacing = c(1, 1),
+  block.dims, nBoot = 100, kappa = 1, user.bandwidth = F,
+  bandwidth = c(1, 1))
 }
 \arguments{
 \item{spdata}{An \eqn{n} by \eqn{3} matrix. The first two columns provide \eqn{(x,y)} spatial coordinates. The third column provides data values at the coordinates.}
@@ -16,15 +17,15 @@ MaityTest(spdata, lagmat, A, df, subblock.dims, xlims, ylims, nBoot = 100,
 
 \item{df}{A scalar indicating the row rank of A. This value gives the degrees of freedom for the asymptotic Chi-sq distribution used to compute the p-value.}
 
-\item{subblock.dims}{A vector of length two corresponding to the width and height of the blocks used in the GBBB. If block width does not evenly divide the width of the sampling region, some data will be ommited during subsampling, i.e., function does not handle partial blocks. Same applies to block height and height of sampling region.}
-
 \item{xlims}{A vector of length two providing the lower and upper x-limits of the sampling region.}
 
 \item{ylims}{A vector of length two providing the lower and upper y-limits of the sampling region.}
 
-\item{nBoot}{A scalar indicating the number of grid based block bootstrap (GBBB) samples to compute (see Lahiri and Zhu (2006) for details on GBBB).}
+\item{grid.spacing}{A vector of length two providing the x (width) and y (height) spacing, respectively, of the underlying grid laid on the sampling region to create spatial blocks. If the grid spacing width does not evenly divide the width of the sampling region, some data will be ommited during subsampling, i.e., the function does not handle partial windows. Same applies to grid spacing height and height of sampling region. See details for an example.}
 
-\item{grid}{A vector of length two indicating the width and height of the underlying grid laid on the sampling region to create spatial blocks.}
+\item{block.dims}{A vector of length two corresponding to the width and height of the blocks used in the GBBB. The dimensions are given in terms of the spacing of the grid laid on the sampling region. See details for an example.}
+
+\item{nBoot}{A scalar indicating the number of grid based block bootstrap (GBBB) samples to compute (see Lahiri and Zhu (2006) for details on GBBB).}
 
 \item{kappa}{A scalar corresponding to the tuning parameter to adjust empirical bandwidth.}
 
@@ -43,7 +44,11 @@ MaityTest(spdata, lagmat, A, df, subblock.dims, xlims, ylims, nBoot = 100,
 This function performs the nonparametric test of isotropy from Maity and Sherman (2012) for spatial data with sampling locations following any general spatial sampling design. It uses the Epanechnikov kernel function with an empirical bandwidth parameter to smooth over spatial lags. The asymptotic variance-covariance matrix is estimated using the grid based block bootstrap (GBBB) from Lahiri and Zhu (2006). See Maity and Sherman (2012) for more details.
 }
 \details{
-This function currently only supports square and rectangular sampling regions and does not currently support partial blocks. For example, suppose the sampling region runs from 0 to 20 in the x-direction and from 0 to 30 in the y-direction and an underlying grid of 1 by 1 is laid over the sampling region. Then an ideal value of subblock.dims would be (2,3) since its entries evenly divide the width (20) and height (30), respectively, of the sampling region. Using the vector (3, 4.5) would imply that some data will not be used in the GBBB since these values would create partial blocks in the sampling region. To preserve the spatial dependence structure, the spatial blocks should have the same shape (i.e. square or rectangle) and orientation as the entire sampling domain.
+This function currently only supports square and rectangular sampling regions and does not support partial blocks. For example, suppose the sampling region runs from 0 to 20 in the x-direction and from 0 to 30 in the y-direction and an underlying grid of 1 by 1 is laid over the sampling region. Then an ideal value of block.dims would be (2,3) since  this would imply the blocks created have dimension 2 by 3 and these values evenly divide the width (20) and height (30), respectively, of the sampling region. Using the vector (3, 4.5) would imply that some data will not be used in the GBBB since these values would create partial blocks in the sampling region.
+
+The value block.dims provides the width and height of the blocks in terms of the underlying grid laid on the sampling region. For example, if a grid with dimensions of grid.spacing = c(0.1, 0.2) is laid on the sampling region and block.dims = c(2,3) then the dimensions of the blocks created by the moving windows are (0.2, 0.6). The block dimensions of 0.2 and 0.6 should evenly divide the width and height, respectively, of the entire sampling region.
+
+To preserve the spatial dependence structure, the spatial blocks should have the same shape (i.e. square or rectangle) and orientation as the entire sampling domain.
 }
 \examples{
 library(mvtnorm)
@@ -66,14 +71,15 @@ z <- t(z)
 mydata <- cbind(coords, z)
 mylags <- rbind(c(1,0), c(0, 1), c(1, 1), c(-1,1))
 myA <- rbind(c(1, -1, 0 , 0), c(0, 0, 1, -1))
-mysb.dims <- c(4,4)
-my.xlims <- c(0, 20)
-my.ylims <- c(0, 20)
+my.xlims <- c(0, 16)
+my.ylims <- c(0, 16)
+my.grid <- c(1,1)
+my.blockdims <- c(4,4)
 #Number of bootstraps for demonstration only.
 #In practice, use nBoot > 50
 my.nBoot <- 3
-tr <- MaityTest(mydata, mylags, myA, df = 2, mysb.dims, my.xlims, my.ylims,
-nBoot = my.nBoot, grid = c(1,1))
+tr <- MaityTest(mydata, mylags, myA, df = 2, my.xlims, my.ylims, my.grid,
+my.blockdims, nBoot = my.nBoot)
 tr
 
 ####NOT RUN####
@@ -89,8 +95,8 @@ tr
 # z <- t(z)
 # mydata <- cbind(coords, z)
 # #Run the test on the data generated from an anisotropic covariance function
-# tr <- MaityTest(mydata, mylags, myA, df = 2, mysb.dims, my.xlims, my.ylims,
-# nBoot = my.nBoot, grid = c(1,1))
+# tr <- MaityTest(mydata, mylags, myA, df = 2, my.xlims, my.ylims,
+# my.grid, my.blockdims, nBoot = my.nBoot)
 # tr
 }
 \references{

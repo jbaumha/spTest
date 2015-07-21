@@ -64,7 +64,7 @@ unifkern = function(u)
 	return(rv)
 }
 #' @keywords internal
-est_gamma_irreg = function(spdata,lagmat, h = 1, kernel = "norm", truncation = 1)
+est_gamma_irreg = function(spdata,lagmat, h = 1, kernel = "norm", truncation = 1.5)
 {
 	if(dim(spdata)[2] != 3)
 	{
@@ -129,19 +129,31 @@ est_gamma3 = function(rawdata, lagmat, h, kernel, truncation)
 	return(rv)
 }
 #' @keywords internal
-subfield_coords = function(xlims, ylims, blk.dim, grid.spacing = 1)
+subfield_coords = function(xlims, ylims, grid.spacing)
 {
-	if(length(xlims) != 2 | length(ylims) != 2)
+	x.locs <-  seq(xlims[1], xlims[2], by = grid.spacing[1])
+	y.locs <-  seq(ylims[1], ylims[2], by = grid.spacing[2])
+	grid.coords <- expand.grid(y.locs, x.locs)
+	grid.coords <- cbind(grid.coords[,2], grid.coords[,1])
+	return(grid.coords)
+}
+#' @keywords internal
+get_bcoords = function(xlims, ylims, grid.coords, grid.sp, f.windims)
+{
+	win.w <-  f.windims[1]*grid.sp[1]
+	win.h <- f.windims[2]*grid.sp[2]
+	
+	blk.coords <- matrix(data = NA, nrow = 0, ncol = 2)
+	for(i in 1:dim(grid.coords)[1])
 	{
-		stop("invalid x or y limits")
+		c.coord <- grid.coords[i,]
+		if( (c.coord[1]+win.w) <= xlims[2] & (c.coord[2]+win.h) <= ylims[2])
+		{
+			blk.coords <- rbind(blk.coords, c.coord)
+		}
 	}
 	
-	x.locs <-  seq(xlims[1], xlims[2]-blk.dim[1], by = grid.spacing)
-	y.locs <-  seq(ylims[1], ylims[2]-blk.dim[2], by = grid.spacing)
-	
-	window.coords <- expand.grid(y.locs, x.locs)
-	window.coords <- cbind(window.coords[,2], window.coords[,1])
-	return(window.coords)
+	return(blk.coords)
 }
 #' @keywords internal
 get_block_data = function(blk.coord, spdata, blk.dim)
@@ -156,34 +168,38 @@ get_block_data = function(blk.coord, spdata, blk.dim)
 	return(spdata[good,])
 }
 #' @keywords internal
-est_subblock_irreg = function(spdata, lagmat,xlims, ylims,blk.width, blk.height, grid.spacing, h, kernel = "unif", truncation = 1)
+est_subblock_irreg = function(spdata, lagmat,xlims, ylims, windims, grid.spacing, h, kernel, truncation)
 {
 	npts <-  dim(spdata)[1]
 	tot.vol <- (xlims[2]-xlims[1])*(ylims[2] - ylims[1])
-	blk.vol <- blk.width*blk.height
-	prop <- blk.vol/tot.vol
-	exp.pts.blk <- prop*npts
-	if(exp.pts.blk < 4)
-	{ warning("number of expected sampling locations/subblock is less than 4")}
+	win.w <- windims[1]*grid.spacing[1]
+	win.h <- windims[2]*grid.spacing[2]
+	win.vol <- win.w*win.h
+	prop <- win.vol/tot.vol
+	exp.pts.win <- prop*npts
+	if(exp.pts.win < 4)
+	{warning("number of expected sampling locations per window is less than 4")}
 	
 	nlags <-  dim(lagmat)[1]
-	blk.dim <-  c(blk.width, blk.height)
 	
-	sb.coords <- subfield_coords(xlims, ylims, blk.dim, grid.spacing)
-	n.blks1 <- dim(sb.coords)[1]
+	sb.coords <- subfield_coords(xlims, ylims, grid.spacing)
+	the.windims <- windims
+	blk.coords <- get_bcoords(xlims, ylims, sb.coords, grid.spacing, the.windims)
+	n.blks1 <- dim(blk.coords)[1]
+	window.size <- c(win.w, win.h)
 	sb.coords.list <- list()
 	for(i in 1:n.blks1)
 	{
-		sb.coords.list[[i]] <- sb.coords[i,]
+		sb.coords.list[[i]] <- blk.coords[i,]
 	}
 	
-	sb.data <- lapply(sb.coords.list, get_block_data, spdata, blk.dim)
+	sb.data <- lapply(sb.coords.list, get_block_data, spdata, window.size)
 	mat.blks <-  unlist( lapply(sb.data,is.matrix) )
 	good <-  which(mat.blks == T)
 	sb.data <-  sb.data[good]
-	blk.size <- do.call(rbind,lapply(sb.data, dim))
-	blk.size <- blk.size[,1]
-	bad <- which(blk.size < 4)
+	blk.pts <- do.call(rbind,lapply(sb.data, dim))
+	blk.pts <- blk.pts[,1]
+	bad <- which(blk.pts < 4)
 	if(length(bad) > 0)
 	{
 		warning("some subblocks discarded due to inadequate data in the block")
@@ -211,7 +227,7 @@ est_subblock_irreg = function(spdata, lagmat,xlims, ylims,blk.width, blk.height,
 	}
 	n.blks2 <- dim(gamma.hat.mat)[1]
 	
-	rv <- list("n.good.blks" = n.blks2,"n.bad.blks" = n.blks1-n.blks2, "blk.sizes" = blk.size, "gamma.hats" = gamma.hat.mat )
+	rv <- list("n.good.blks" = n.blks2,"n.bad.blks" = n.blks1-n.blks2, "window.size" = window.size, "gamma.hats" = gamma.hat.mat )
 	
 	return(rv)
 }

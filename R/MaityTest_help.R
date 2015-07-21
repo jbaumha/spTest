@@ -69,14 +69,9 @@ est_chat_t = function(lag, raw_cov_data, kappa, usr.band, bw)
 }
 #' @keywords internal
 get_block_coords = function(blk.dims, xlims, ylims, grid = c(1,1))
-{
-	if(blk.dims[1] < grid[1])
-	{stop("blk.dim[1] must be >= grid[1]")}
-	if(blk.dims[2] < grid[2])
-	{stop("blk.dim[2] must be >= grid[2]")}
-	
+{	
 	x.grid <- seq(xlims[1], xlims[2], by = grid[1])
-	y.grid <- seq(ylims[1], xlims[2], by = grid[2])
+	y.grid <- seq(ylims[1], ylims[2], by = grid[2])
 
 	bad.x <- which(x.grid + blk.dims[1] > xlims[2])
 	bad.y <- which(y.grid + blk.dims[2] > ylims[2])
@@ -163,9 +158,9 @@ change_coords = function(blk1.coords, blk2.coords, blk2.data)
 	return(shifted.blk.data)
 }
 #' @keywords internal
-est_block_chats = function(lags, spdata, nBoot, blk.dims, xlims, ylims, grid = c(1,1), kappa = 1, usr.band = F, bw = c(1,1))
+est_block_chats = function(lags, spdata, nBoot, blk.dims, xlims, ylims, grid, kappa = 1, usr.band = F, bw = c(1,1))
 {
-	
+	blk.dims <- c(grid[1]*blk.dims[1], grid[2]*blk.dims[2])
 	blk.coords <- get_block_coords(blk.dims, xlims, ylims, grid)
 	Kn <- blk.coords$Kn
 	Ln <- blk.coords$Ln
