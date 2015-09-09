@@ -135,8 +135,8 @@ spatial_boot = function(Kn, Ln, blk.data.list)
 	if(length(bad) > 0)
 	{
 		nL.blk.indeces <- nL.blk.indeces[-bad]
-		if(length(bad) > 5)
-		{warning("at least 5 empty subblocks, consider increasing block size")}
+		if(length(bad) > 1)
+		{warning(paste("There are ", length(bad), " empty subblocks; consider increasing block size if there are many empty subblocks."))}
 	}
 	bsample <- sample(nL.blk.indeces, nK.blks, replace = T)
 	

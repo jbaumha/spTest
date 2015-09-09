@@ -38,9 +38,9 @@ GuanTestUnif(spdata, lagmat, A, df, h = 1, kernel = "norm",
 \value{
 \item{gamma.hat}{A matrix of the spatial lags provided and the semivariogram point estimates at those lags used to construct the test statistic.}
 \item{sigma.hat}{The estimate of asymptotic variance-covariance matrix, Sigma, used to construct test statistic.}
-\item{n.subblocks}{The number of moving windows (blocks) used to estimate Sigma.}
+\item{n.subblocks}{The number of subblocks created by the moving window used to estimate Sigma.}
 \item{test.stat}{The calculated test statistic.}
-\item{pvalue.finite}{The approximate, finite-sample adjusted p-value computed by using the moving windows (see Guan et. al. (2004), Section 3.3 for details).}
+\item{pvalue.finite}{The approximate, finite-sample adjusted p-value computed by using the subblocks created by the moving windows (see Guan et. al. (2004), Section 3.3 for details).}
 \item{pvalue.chisq}{The p-value computed using the asymptotic Chi-sq distribution.}
 }
 \description{

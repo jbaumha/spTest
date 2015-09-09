@@ -202,7 +202,7 @@ est_subblock_irreg = function(spdata, lagmat,xlims, ylims, windims, grid.spacing
 	bad <- which(blk.pts < 4)
 	if(length(bad) > 0)
 	{
-		warning("some subblocks discarded due to inadequate data in the block")
+		warning(paste(length(bad)," subblocks discarded due to inadequate data in the block (n < 4); consider increasing block size") )
 		sb.data <- sb.data[-bad]
 	}
 	
@@ -222,7 +222,7 @@ est_subblock_irreg = function(spdata, lagmat,xlims, ylims, windims, grid.spacing
 	
 	if(length(bad) > 0)
 	{
-		warning("some subblocks discarded due to under-smoothing (small bandwidth, h)")
+		warning(paste(length(bad)," subblocks discarded due to under-smoothing (small bandwidth, h)"))
 		gamma.hat.mat <- gamma.hat.mat[-bad,] 
 	}
 	n.blks2 <- dim(gamma.hat.mat)[1]

@@ -6,7 +6,7 @@ scale_coords = function(spdata)
 	
 	coords.new <- spdata[,1:2]
 	coords.new[,1] <- (coords.new[,1] - min.x)+1
-	coords.new[,2] <- (coords.new[,2] - min.x)+1
+	coords.new[,2] <- (coords.new[,2] - min.y)+1
 	
 	spdata.shift <-cbind(coords.new, spdata[,3])
 	

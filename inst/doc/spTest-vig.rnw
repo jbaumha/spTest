@@ -1,0 +1,499 @@
+\documentclass[a4paper]{article}
+
+\usepackage{Sweave}
+
+\usepackage[utf8]{inputenc}
+
+\usepackage[figuresright]{rotating}
+\usepackage{tabu}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{mathtools}
+\usepackage{pifont}
+\usepackage{lineno}
+\usepackage{graphicx}
+\usepackage{enumerate}
+\usepackage{rotating}
+\usepackage[round]{natbib}
+\usepackage{scrextend}
+\usepackage{datetime}
+\usepackage{array}
+\usepackage{multicol}
+\usepackage[justification = raggedright]{subcaption}
+%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\proglang}[1]{{\textsf{#1}}}
+\newcommand{\R}{\proglang{R }}
+\newcommand{\pkg}[1]{{\normalfont\fontseries{b}\selectfont #1}}
+\newcommand{\pbs}[1]{\let\tmp\\#1\let\\\tmp} 
+%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\s}{\mathbf{s}}
+\newcommand{\h}{\mathbf{h}}
+\newcommand{\ttt}{\mathbf{t}}
+\newcommand{\0}{\mathbf{0}}
+\newcommand{\A}{\mathbf{A}}
+\newcommand{\G}{\mathbf{G}}
+\newcommand{\D}{\mathcal{D}}
+%\newcommand{\Re}{\mathbb{R}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\x}{\mathbf{x}}
+\newcommand{\bg}{\boldsymbol{\gamma}}
+\newcommand{\bo}{\boldsymbol{\omega}}
+\newcommand{\be}{\boldsymbol{\epsilon}}
+\newcommand{\bL}{\mathbf{\Lambda}}
+\newtheorem{definition}[subsubsection]{Definition}
+\newtheorem{remark}[section]{Remark}
+\numberwithin{equation}{section}
+\newtheorem{definitionA}[subsubsection]{Definition}
+%%%%%%%%%%%%%%%%%%%%%%%%%
+\SweaveOpts{prefix.string=figures/fig}
+\SweaveOpts{keep.source=FALSE} 
+\SweaveOpts{highlight=TRUE, tidy=TRUE, keep.space=TRUE, keep.blank.space=FALSE, keep.comment=TRUE}
+\SweaveOpts{eps=TRUE, pdf=FALSE, png=FALSE}
+
+% \VignetteIndexEntry{spTest-vig}
+% \VignetteDepends{geoR, fields, splines}
+% \VignetteKeyword{anisotropy}
+
+\title{spTest: An R Package Implementing Nonparametric Tests of Isotropy}
+\author{Zachary D. Weller}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+An important step of modeling spatially-referenced data is appropriately specifying the second order properties of the random field. A scientist developing a model for spatial data has a number of options regarding the nature of the dependence between observations. One of these options is deciding whether or not the dependence between observations depends on direction, or, in other words, whether or not the covariance function is isotropic. Isotropy implies that spatial dependence is a function of only the distance and not the direction of the spatial separation between points. A researcher may use graphical techniques, such as directional sample semivariograms, to determine whether an assumption of isotropy holds. These graphical diagnostics can be difficult to assess, subject to personal interpretation, and potentially misleading since they typically do not include a measure of uncertainty. To escape these issues, a hypothesis test of the assumption of isotropy may be more desirable. To avoid specification of the covariance function, a number of nonparametric tests of isotropy have been developed using both the spatial and spectral representations of random fields. Several of these nonparametric tests are implemented in the \R package \pkg{spTest}, available on \texttt{CRAN}. We demonstrate how graphical techniques and the hypothesis tests programmed in \pkg{spTest} can be used in practice to assess isotropy properties.
+\end{abstract}
+
+\section{Introduction}
+An important step in modeling a spatial processes is choosing the form of the covariance function. The form of the covariance function will have an effect on kriging as well as parameter estimates and the associated uncertainty. Misspecification of the second order properties can lead to misleading inference. \citet[pg.~87-90]{sherman2011spatial} and \citet{guan2004isotropy} summarize the implications of incorrectly specifying isotropy properties through numerical examples. In order to choose an appropriate model, a statistician must first assess the nature of the spatial variation of his or her data. To this end, a number of graphical techniques are available, such as directional sample variograms or rose diagrams to check for anisotropy \citep[pg.~149-154]{matheron1961precision,isaaks1989applied}. Spatial statisticians may have intuition about the interpretation and reliability of these diagnostics, but a less experienced user may desire a more objective evaluation in the form of a hypothesis test. In this paper, we use two real data examples to illustrate how the nonparametric hypothesis tests available in the \R package \pkg{spTest} \citep{spTest} can be used to assess isotropy properties in spatially-referenced data. The examples also demonstrate how graphical techniques and hypothesis tests can, and should, be used in a complementary role. The remainder of the paper is organized as follows: Section \ref{notation} establishes notation and definitions; Section \ref{sptest-functions} describes the functionality of the \pkg{spTest} package; Section \ref{applications} demonstrates how to use the functions in \pkg{spTest} in conjunction with graphical techniques on two different data sets; Section \ref{discussion} concludes the paper with a discussion.
+
+\section{Notation}\label{notation}
+
+\subsection{Spatial Statistics}\label{spatial}
+In Section \ref{spatial} we briefly review key definitions required for describing and performing tests of isotropy. For additional background, see \citet{weller2015} or \citet{schab}. Let $\{Y(\s): \s \in \D \subseteq \Re^2\}$ be a second order stationary random field (RF). Let $\{\s_1, \ldots, \s_n\} \subset \D$ be the finite set of locations at which the random process is observed, providing the random vector $\mathbf{Y} = (Y(\s_1), \ldots , Y(\s_n))^T$. The sampling locations may follow one of several spatial sampling designs, for example, gridded locations, randomly and uniformly distributed locations, a cluster design, or any other general design. Note that some authors discuss the distinction between a lattice process and a geostatistical process observed on a grid \citep[e.g.,][pg.~6-10]{fuentes2010spectral, schab}. We do not explore this distinction further and will use the term grid throughout. 
+
+For a spatial lag $\h = (h_1, h_2)$, the semivariogram function describes dependence between observations, $\mathbf{Y}$, at spatial locations separated by lag $\h$ and is defined as
+\begin{equation}\label{semivariogram}
+	\bg(\h) = \frac{1}{2}\mbox{Var}(Y(\s + \h) - Y(\s)).
+\end{equation}
+The classical moment-based estimator of the semivariogram \citep{matheron1962traite} is 
+	\begin{equation}\label{classical}
+		\widehat{\gamma}(\h) = \frac{1}{2|\D(\h)|} \sum [Y(\s) - Y(\s + \h)]^2,
+	\end{equation}
+where the sum is over $\D(\h) = \{\s:\s, \s + \h \in \D\}$ and $|\D(\h)|$ is the number of elements in $\D(\h)$. The set $\D(\h)$ is the set of sampling location pairs that are separated by spatial lag $\h$. The covariance function is defined by
+\begin{equation}\label{covfcn}
+ C(\h) = \mbox{Cov}(Y(\s), Y(\s + \h))
+ \end{equation}
+ and is an alternative to the semivariogram for describing spatial dependence. The covariance function, or covariogram, is related to the semivariogram function by $C(\h) = \bg(\0) - \bg(\h)$. 
+ 
+It is often of interest to infer the effect of covariates on the process, deduce dependence structure, and/or predict $Y$ with quantifiable uncertainty at new locations. To achieve these goals, the practitioner must specify the distributional properties of the spatial process. A common assumption is that the finite-dimensional joint distribution is multivariate normal (MVN), in which case we call the RF a Gaussian random field (GRF). Since we are interested in the second order properties, hereafter we assume that the mean of the RF is zero.
+
+A common simplifying assumption about the spatial dependence structure is that it is isotropic.
+\begin{definition}\label{iso}
+	A spatial process is isotropic if the semivariogram, $\bg(\h)$, [or equivalently, the covariance function $C(\h)$] of the spatial process depends on the lag vector $\h$ only through its Euclidean length, $||\h||$, i.e., $\bg(\h) = \bg_{0}(||\h||)$ for some function $\bg_{0}(\cdot)$ of a univariate argument.
+\end{definition}
+\noindent Isotropy implies that the dependence between any two observations depends only on the Euclidean distance between their sampling locations and not on their relative orientation. A spatial process that is not isotropic is called anisotropic. The methods in \pkg{spTest} are designed to determine whether or not the assumption of isotropy holds. Namely, the functions in \pkg{spTest} implement nonparametric hypothesis tests of isotropy, which avoid the choice of a parametric form for the covariance (semivariogram) function.
+
+There are two important modifications to the estimator in Equation \eqref{classical} that are pertinent to the methods described in this paper. First, for non-gridded sampling locations, the estimator needs to be modified to account for the fact that very few pairs of locations will be separated by a specific spatial lag, $\h$. One solution to this challenge is to specify a distance tolerance, $\epsilon$, such that lags having length $||\h|| \pm \epsilon$ are included in estimating the semivariance at lag $\h$. Second, directional sample semivariograms can be estimated by only using observations that are separated by spatial lags in a specific direction. For example, to investigate potential anisotropy, we can compare sample semivariograms between the horizontal and vertical directions. For non-gridded sampling locations, very few pairs of locations will lie at a specific distance and directional lag, so we need to allow for both a distance and a directional tolerance when estimating the semivariance. A common method for doing this is by using a kernel smoother that smoothes over both the horizontal ($h_1$) and vertical ($h_2$) components of the spatial lag $\h = (h_1, h_2)$.
+
+Spatial RFs and their second order properties can also be expressed in the spectral (or frequency) domain using Fourier transforms. The spectral representation of RFs and their second order properties provides alternative methods for testing second order properties. For brevity we focus only on the methods in the spatial domain and refer the interested reader to \citet{weller2015} or \citet{fuentes2010spectral}. We note that that the spectral methods from \citet{lu2005test} are also implemented in \pkg{spTest}.
+
+\subsection{Nonparametric Tests of Isotropy}\label{nptests}
+\citet{lu1994distributions} and \citet{lu2001testing} pioneered a popular approach to testing second-order properties when they used the asymptotic joint normality of the sample semivariogram computed at different spatial lags to evaluate symmetry and isotropy properties. The subsequent works of \citet{guan2004isotropy} and \citet{maity2012test} built upon these ideas and are the primary methods programmed in \pkg{spTest}. Here we give an overview of the tests in \citet{guan2004isotropy} and \citet{maity2012test}.
+
+Under the null hypothesis that the RF is isotropic, it follows that the values of $\bg(\cdot)$ evaluated at any two spatial lags that have the same norm are equal, independent of the direction of the lags. For example, under the assumption of isotropy, $\bg((-3,0)) = \bg\left(\left(\sqrt{3}, \sqrt{3} \hspace{1 mm} \right)\right)$. To completely specify the null hypothesis of isotropy, theoretically, one would need to compare semivariogram values for an infinite set of lags. In practice a small number of lags are specified. Then it is possible to test a hypothesis consisting of a set of linear contrasts of the form 
+\begin{equation}\label{linearhypothesis}
+H_0: \A\bg(\cdot) = \mathbf{0}
+\end{equation}
+as a proxy for the null hypothesis of isotropy, where $\A$ is a full row rank matrix \citep{lu2001testing}. For example, a set of lags, denoted $\bL$, commonly used in practice on gridded sampling locations with unit spacing is
+\begin{equation}\label{lagset}
+ \bL = \{ \h_1 = (1,0), \h_2 = (0,1), \h_3 = (1,1),  \h_4 = (-1,1) \}, 
+ \end{equation}
+ and the corresponding $\A$ matrix under $H_0: \A\bg(\bL) = \mathbf{0}$ is
+\begin{equation}\label{amat}
+	\A = \begin{bmatrix}
+		1 & -1 & 0 & 0 \\
+		0 & 0 & 1 & -1 
+		\end{bmatrix}.
+\end{equation}
+
+In other words, by using \eqref{lagset} and \eqref{amat} under the hypothesis \eqref{linearhypothesis}, we contrast the semivariogram values at lags $\h_1 = (1,0)$ and $\h_2 = (0,1)$, and likewise, contrast semivariogram values at lags $\h_3 = (1,1)$ and $\h_4 = (-1,1)$. An important step in detecting anisotropy is the choice of lags, $\bL$, as the test results will only hold for the set of lags considered \citep{guan2004isotropy}. While this choice is somewhat subjective, there are several considerations for determining the set of lags. First, in terms of Euclidean distance, short lags should be chosen since estimates of the semivariance at long lags will be less reliable than estimates at short lags because they are based on fewer pairs of observations and hence more variable. Second, pairs of orthogonal lags should be contrasted since, for an anisotropic process, the directions of strongest and weakest spatial correlation will typically be orthogonal. For other considerations and more detailed guidelines regarding the choice of lags, $\bL$, see \href{http://arxiv.org/abs/1508.05973}{\citet{weller2015}}, \citet{lu2001testing}, and \citet{guan2004isotropy}.
+
+The tests in \citet{guan2004isotropy} and \citet{maity2012test} involve estimating either the semivariogram \eqref{semivariogram} or covariogram \eqref{covfcn} and evaluating the estimator at the set of chosen lags, $\bL$. Denoting the set of point estimates of the variogram/covariogram at the given lags as $\widehat{\G}_n$, the true values as $\G$, and normalizing constant $a_n$, a central result for all three methods is that
+\begin{equation}\label{asymptoticMVN}
+a_n(\widehat{\G}_n - \G) \xrightarrow[n \rightarrow \infty]{d} MVN(\mathbf{0}, \mathbf{\Sigma}),
+\end{equation}
+under increasing domain asymptotics and mild moment and mixing conditions on the RF. The test statistic is a quadratic form
+\begin{equation}\label{ts}
+TS = b_n^2(\A\widehat{\G}_n)^{T}(\A\widehat{\mathbf{\Sigma}}\A^T)^{-1} (\A\widehat{\G}_n),
+\end{equation}
+where $\widehat{\mathbf{\Sigma}}$ is an estimate of the asymptotic variance-covariance matrix and $b_n$ is a normalizing constant. A p-value can be obtained from the asymptotic $\chi^2$ distribution with degrees of freedom given by the row rank of $\A$. Important differences in these works regard the distribution of sampling locations, shape of the sampling domain, estimation of $\G$ and $\mathbf{\Sigma}$, and assumptions on the dependence structure of the random field (see \citet{weller2015} for more details).
+
+\section{Nonparametric Tests Implemented in \pkg{spTest}}\label{sptest-functions}
+The \R package \pkg{spTest} includes functions for implementing the tests developed in \citet{guan2004isotropy}, \citet{lu2005test}, and \citet{maity2012test}. The primary functions in \pkg{spTest} for implementing these tests are \verb@LuTest@, \verb@MaityTest@, \verb@GuanTestGrid@, and \verb@GuanTestUnif@. For example, the test from \citet{guan2004isotropy} for data observed at non-gridded, but uniformly distributed, sampling locations is implemented in the function \texttt{GuanTestUnif}, which takes the following arguments:
+
+\begin{center}
+\begin{verbatim}
+GuanTestUnif(spdata, lagmat, A, df, h = 1, kernel = "norm",
+  truncation = 1.5, xlims, ylims, grid.spacing = c(1, 1),
+  window.dims = c(2, 2), subblock.h, sig.est.finite = T).
+\end{verbatim}
+\end{center}
+There are several necessary inputs. The matrix \texttt{spdata} includes the coordinates of sampling locations and the corresponding data values. The spatial lags that will be used to estimate the semivariance, denoted $\bL$, are specified in the matrix \texttt{lagmat}. The matrix \texttt{A} provides the contrasts of the semivariance estimates, and its row rank is indicated by the parameter \texttt{df} (the degrees of freedom for the asymptotic $\chi^2$ distribution). The values \texttt{h} and \texttt{kernel} provide the bandwidth (smoothing) parameter and form of the kernel smoother, respectively, used to smooth over spatial lags when estimating the semivariance. If a normal smoothing kernel is used, then the \texttt{truncation} parameter indicates where to truncate the normal kernel (i.e., zero weight for values larger than this value). The parameters \texttt{xlims} and \texttt{ylims} give the horizontal and vertical limits of the sampling region (a rectangular sampling region is assumed). A grid is laid over the sampling region according the width and height specified by \texttt{grid.spacing}. The dimensions of the moving windows, given in the units of the underlying grid, are determined by the values in \texttt{window.dims}. The bandwidth used to estimate the semivariance on the subblocks of data is indicated by \texttt{subblock.h} and a finite sample adjustment to the estimate of the asymptotic variance-covariance matrix is made by setting \texttt{sig.est.finte = T}. For more information about the different arguments and guidelines on how to choose them, see \citet{weller2015}, the \href{https://cran.r-project.org/web/packages/spTest/spTest.pdf}{\pkg{spTest} manual} (\url{https://cran.r-project.org/web/packages/spTest/index.html}), and the original works.
+
+\section{Applications: using \texttt{spTest} to check for anisotropy}\label{applications}
+We demonstrate the functions in \pkg{spTest} on two data sets: the first containing gridded sampling locations, the second non-gridded sampling locations. For more details on the functions and more examples using simulated data, see the official \href{https://cran.r-project.org/web/packages/spTest/spTest.pdf}{\pkg{spTest} manual}). The \pkg{spTest} package can be used completely independently, but it works nicely with two other packages loaded into \R: \pkg{fields} \citep{fields} and \pkg{geoR} \citep{geor}. The package \pkg{fields} is automatically installed with \pkg{spTest}, while \pkg{geoR} is not. We also load the \pkg{splines} package \citep{splines}, which we'll use to fit mean functions.
+
+<<label = libs, echo = TRUE>>=
+#install.packages("spTest")
+#install.packages("geoR")
+#install.packages("splines")
+library(spTest)
+library(fields)
+library(geoR)
+library(splines)
+@
+
+For the two examples given below, we'll use graphical diagnostics and the hypothesis tests implemented in \pkg{spTest} to determine whether or not an assumption of isotropy is reasonable for spatially-referenced data. The general strategy will be to first do exploratory data analysis (EDA) of the original data and create a model for the mean of the spatial process using appropriate covariates. After estimating a model for the mean, we'll extract residuals and again use EDA to check for remaining spatial dependence and utilize graphical diagnostics and hypothesis tests to investigate potential anisotropy. We note that, for brevity, we have not included the full version of EDA code and plots; instead, including only the most relevant to demonstrating the functionality of the \pkg{spTest} package. The complete version of the code is available on \href{https://github.com/zdweller/spTest_VignetteCode/blob/master/code}{\texttt{github}}.
+
+\subsection{Gridded Sampling Locations}
+The gridded data used in this section come from the North American Regional Climate Change Assessment Program [NARCCAP] \citep{mearns2009regional}. The data set \texttt{WRFG} in \pkg{spTest} includes coordinates and a 24-year average of yearly average temperatures from runs of the WRFG regional climate model (RCM) using boundary conditions from the National Centers for Environmental Prediction (NCEP). The \href{https://www.earthsystemgrid.org/project/narccap.html}{original data} and the \href{https://github.com/zdweller/Read-NARCCAP/blob/master/read_WRFG_script}{\R code} used to create the yearly averages are available online. The data set contains both latitude and longitude coordinates and map projection coordinates that specify the regular grid for 14,606 grid boxes along with average temperature at each grid box. We can display a heat map of all of the data using the \verb@image.plot@ function from the \pkg{fields} package (see Figure~\ref{narccap1}). Due to computational considerations and because the methods in \pkg{spTest} assume stationarity, for our analysis we'll use a $20 \times 20$ subset of the grid boxes over the central United States (see Figure~\ref{narccap2}).
+
+<<label=narccap,fig=TRUE,include=FALSE>>=
+data(WRFG)
+image.plot(WRFG$lon-360, WRFG$lat, WRFG$WRFG.NCEP.tas, xlab = "Longitude",
+ylab = "Latitude", main = "Mean WRFG-NCEP Temperatures")
+world(add = T)
+@
+<<label = narccap2, fig = TRUE, include = FALSE>>=
+coords <- expand.grid(WRFG$xc,WRFG$yc)
+sub <- which(coords[,1] > 2.95e6 & coords[,1] < 4.0e6 
+& coords[,2] > 1.2e6 & coords[,2] < 2.25e6)
+image.plot(WRFG$xc, WRFG$yc, WRFG$WRFG.NCEP.tas, xlab = "Easting", 
+ylab = "Northing", main = "Map Projection Coordinates")
+points(coords[sub,], pch = 16, cex = 0.35)
+my.coords <- coords[sub,]
+colnames(my.coords) <- c("xc", "yc") 
+tas <- WRFG$WRFG.NCEP.tas
+tas <- c(tas)
+tas <- tas[sub]
+mydata <- cbind(my.coords[,1],my.coords[,2], tas)
+@
+
+\begin{figure}
+	\begin{subfigure}[t]{0.5\linewidth}
+	\centering
+	\includegraphics[width = 2.5 in]{figures/fig-narccap.eps}
+	\caption{}
+	\label{narccap1}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.5\linewidth}
+	\centering
+	\includegraphics[width = 2.5 in]{figures/fig-narccap2.eps}
+	\caption{}
+	\label{narccap2}
+	\end{subfigure}
+\caption{Heat maps of average temperatures of WRFG-NCEP output from NARCCAP. Figure~\ref{narccap1} displays the average of WRFG-NCEP yearly average temperature over 24 years with coordinates in latitude and longitude. Figure~\ref{narccap2} displays the same data but on the gridded map projection (easting/northing) coordinates, and the black points indicate the subset of the data used for this example. }
+\label{narccap}
+\end{figure}
+
+To investigate potential anisotropy in the relevant subset of these data, we can examine two graphical diagnostics: a heat map and directional sample semivariograms. We'll use the function \verb@variog4@ from the \pkg{geoR} package to estimate directional semivariograms to visually assess isotropy properties.
+
+<<label = heatmap1, results = hide, fig = T, include = F>>=
+x.coord <- unique(my.coords[,1])
+y.coord <- unique(my.coords[,2])
+nx <- length(x.coord)
+ny <- length(y.coord)
+tas.mat <- matrix(mydata[,3], nrow = nx, ncol = ny, byrow = F)
+par(mfrow = c(1,2), oma = c(0,0,2,0))
+image.plot(x.coord, y.coord, tas.mat, ylab = "Northing", xlab = "Easting",
+main = "Subset of Temperatures")
+@
+<<label = dirsemi1, results = hide, fig = T, include = F>>=
+geodat <- as.geodata(mydata)
+svar4 <- variog4(geodat)
+plot(svar4)
+title("Directional Sample Semivariograms")
+@
+\begin{figure}
+	\begin{subfigure}[t]{0.5\linewidth}
+	\centering
+	\includegraphics[width = 4.25 in, height = 2.65 in]{figures/fig-heatmap1.eps}
+	\caption{}
+	\label{hm1}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.5\linewidth}
+	%\centering
+	\includegraphics[width = 2.5 in]{figures/fig-dirsemi1.eps}
+	\caption{Directional sample semivariograms of average temperatures.}
+	\label{dv1}
+	\end{subfigure}
+\caption{Graphical assessments of isotropy in the $20 \times 20$ subset of WRFG temperature data. Because northing (latitude) coordinates have not been accounted for, the heat map (\ref{hm1}) indicates that the dependence between observations is stronger in the east-west direction than the north-south direction. The directional dependence is also evidence by the differences between the directional sample semivariograms (\ref{dv1}).}
+\label{fig2}
+\end{figure}
+
+The heat map in Figure~\ref{hm1} indicates that the spatial process is anisotropic, having a stronger spatial dependence in the horizontal direction than the vertical direction. Intuitively, northing (latitude) is an important factor in determining average temperature, and we need to include its effect in a model for these data. We also notice non-linear trends in temperature as a function of easting (longitude), see Figure~\ref{hm1}. Thus, the anisotropy can be attributed, at least in part, to the fact that we have not modeled important covariates related to the process. The directional sample semivariograms in Figure~\ref{dv1} reaffirm the notion that the data exhibit anisotropy as the $0^{\circ}$ sample semivariogram appears much different than the other three. Before modeling the effects of northing and easting coordinates, we'll use the \verb@GuanTestGrid@ function from \pkg{spTest} to affirm our intuition that these data exhibit anisotropy.
+
+While some of the nonparametric methods for testing isotropy do not require Gaussian data, necessary conditions for the asymptotic properties of the test to hold are typically met when the data are Gaussian. A histogram of the WRFG temperature data (not shown) indicates that a Gaussian assumption is not unreasonable. To implement the nonparametric test in \citet{guan2004isotropy} via the function \verb@GuanTestGrid@, we need to specify the spatial lags that will be used to test for differences in the semivariogram. Based on the sample semivariograms in Figure~\ref{dv1}, we begin to see a noticeable difference in the semivariograms at a distance of approximately 200,000. Since the distance between sampling locations is 50,000, we should use spatial lags with lengths of approximately $200,000/50,000 = 4$ units. For this test we choose the lag set 
+\[
+ \bL = \{ \h_1 = (4,0), \h_2 = (0,4), \h_3 = (3,3),  \h_4 = (-3,3)\},
+\]
+and we use the matrix $\A$ in Equation \eqref{amat}. To create subblocks of data used to estimate $\mathbf{\Sigma}$, we choose a moving window with size $2 \times 2$. The moving window dimensions should be chosen so that the window has the same shape (i.e., square or rectangle) and orientation as the entire data set. To maximize the amount of data used to estimate $\mathbf{\Sigma}$, the dimensions of the window should evenly divide the number of columns and rows, respectively, of the entire region. For this example there are 20 rows and columns; hence, window dimensions of $2 \times 2$ or $4 \times 4$ are ideal choices. Using a window size of $2 \times 2$, we run the test via the following code.
+
+<<label = test1>>=
+my.delta <- 50000
+mylags <-  rbind(c(4,0), c(0, 4), c(3, 3), c(-3,3))
+myA <-  rbind(c(1, -1, 0 , 0), c(0, 0, 1, -1))
+tr <- GuanTestGrid(spdata = mydata, delta = my.delta, lagmat = mylags, A = myA,
+ window.dims = c(2,2),pt.est.edge = TRUE, sig.est.edge = TRUE, 
+ sig.est.finite = TRUE, df = 2 )
+tr$pvalue.finite
+@
+
+As expected, the results of the hypothesis test (p-value $< 0.05$) indicate that the data exhibit anisotropy. Here, we note that the p-value is given as exactly 0 due to a finite sample correction \citep{guan2004isotropy}. The function \verb@GuanTestGrid@, and other functions in \pkg{spTest}, return a p-value for the test and information used in computing the p-value, such as the point estimates ($\widehat{\G}_n$), estimates of the asymptotic variance-covariance matrix ($\widehat{\mathbf{\Sigma}}$), the number of subblocks used to estimate $\mathbf{\Sigma}$, and other information about the estimation process. Here we note that the point estimates for the directional semivariance are slightly different between the functions from the \pkg{spTest} and \pkg{geoR} packages due to different kernel methods used in estimation.
+
+As mentioned earlier, we need to model the effects of northing and easting (latitude and longitude) coordinates on average temperature. We fit temperature as a nonparametric additive function of both the northing and easting coordinates via least-squares using cubic splines. The cubic splines can be specified using the function \verb@ns@ from the \pkg{splines} package and the least squares fit is computed via the \verb@lm@ function.
+
+<<label = model1, results = hide, fig = T, include = F, width = 10>>=
+x1 <- my.coords[,1]
+x2 <- my.coords[,2]
+m1 <- lm(tas ~ ns(x1, df = 3) + ns(x2, df = 3))
+summary(m1)
+@
+
+After removing the mean effects of the coordinates, we can check for any remaining (unaccounted for) spatial dependence and evidence of anisotropy in the residuals using graphical diagnostics and a hypothesis test. A histogram of the residuals (not shown) indicates that a Gaussian assumption is reasonable.
+
+<<label = iso2, results = hide, fig = T, include = F>>=
+resid <- m1$resid
+resid.mat <- matrix(resid, nrow = nx, ncol = ny, byrow = F)
+image.plot(x.coord, y.coord, resid.mat, xlab = "Easting", ylab = "Northing", 
+main = "Heat Map of Residuals")
+@
+<<label = dsvar2, results = hide, fig = T, include = F>>=
+resid.dat <- cbind(mydata[,1:2], resid)
+geodat.resid <- as.geodata(resid.dat)
+plot(variog4(geodat.resid))
+title("Directional Sample Semivariograms")
+@
+\begin{figure}
+	\begin{subfigure}[t]{0.5\linewidth}
+	\centering
+	\includegraphics[width = 2.5 in, height = 2.5 in]{figures/fig-iso2.eps}
+	\caption{}
+	\label{hm2}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.5\linewidth}
+	%\centering
+	\includegraphics[width = 2.5 in]{figures/fig-dsvar2.eps}
+	\caption{}
+	\label{dv2}
+	\end{subfigure}
+\caption{Graphical assessments of isotropy in the residuals. The appearance of elongated areas of similar residual values in the heat map (\ref{hm2}) indicates that the process may be anisotropic. The directional semivariograms (\ref{dv2}) do not appear to exhibit differences, indicating that the process is isotropic.}
+\label{fig3}
+\end{figure}
+
+The heat map (Figure~\ref{hm2}) and directional sample semivariograms (Figure~\ref{dv2}) in Figure~\ref{fig3} indicate that the residuals are still spatially dependent but do not clearly illustrate whether or not the residuals exhibit anisotropy. There appears to be directional dependence along the NW to SE direction in the northern parts of the heatmap (Figure~\ref{hm2}). The directional sample semivariograms do not appear to be different until the distance is greater than 200000. Semivariogram estimates at large distances can be unreliable because there are fewer pairs of points to estimate this value than at short distances. Likewise, directional semivariograms are less reliable than a uni-directional semivariogram because fewer pairs of points are used at each distance for directional estimation. The unreliability of the semivariograms at the larger distances, coupled with the lack of a measure of uncertainty, make it difficult to determine whether or not an assumption of isotropy is reasonable. In hopes of gaining more insight into the isotropy properties, we perform a nonparametric hypothesis test of isotropy using the residuals with the same choices for $\bL$, $\A$, and the window dimensions.
+
+<<label = test2>>=
+tr <- GuanTestGrid(spdata = resid.dat, delta = my.delta, lagmat = mylags, A = myA,
+ window.dims = c(2,2),pt.est.edge = TRUE, sig.est.edge = TRUE, 
+ sig.est.finite = TRUE, df = 2 )
+tr$pvalue.finite
+@
+
+This time the data do not provide evidence for anisotropy (p-value $> 0.05$). These results suggest that it may be appropriate to choose an isotropic covariance function to model these data. However, it is important to note that we have not included the effect of other potentially influential covariates such as elevation or water cover in the model for temperature. Additionally, although we examined a $20 \times 20$ subset of the data, the grid boxes still cover a large geographic region of the U.S., and thus an assumption of stationarity, which is needed for the asymptotic properties of the hypothesis test to hold, may not be reasonable. Indeed, we notice areas of potentially different directional dependence between the north-eastern and south-eastern portions of the heat map in Figure~\ref{hm2}.
+
+\subsection{Non-gridded Sampling Locations}
+The non-gridded data set used in this section describes monthly surface meterology for the state of Colorado and comes from the National Center for Atmospheric Research (NCAR). The data are available in the package \pkg{fields} or online (\url{http://www.image.ucar.edu/GSP/Data/US.monthly.met/CO.html}). For this example, we will use the log of the 30-year average of average yearly precipitation at 344 station locations during the time period 1968-1997. 
+
+Like the temperature data, our goal will be to model the mean effect of covariates and check for spatial dependence and potential anisotropy in the residuals. We can create a heat map of the log precipitation values and the elevation of the stations using the function \verb@quilt.plot@ from the \pkg{fields} package.
+
+<<label = rain, results = hide, fig = T, include = F>>==
+data(COmonthlyMet)
+dim(CO.ppt)
+sub30 <- CO.ppt[74:103,,]
+dim(sub30)
+nstations <- 376
+years <- 1968:1997
+nyears <- length(years)
+yr.avg <- matrix(data = NA, nrow = nstations, ncol = nyears)
+for(i in 1:nyears)
+{
+	yr.dat <- sub30[i,,]
+	yr.avg[,i] <- apply(yr.dat, 2 , mean, na.rm = T)
+}
+avg30 <- apply(yr.avg, 1, mean, na.rm = T)
+
+quilt.plot(CO.loc, log(avg30), xlab = "Longitude", ylab = "Latitude",
+main = "Quilt Plot of log(precip)")
+US(add = T)
+@
+<<label = elev, results = hide, fig = T, include = F>>==
+quilt.plot(CO.loc, CO.elev, xlab = "Longitude", ylab = "Latitude",
+main = "Quilt Plot of Elevation")
+US(add = T)
+@
+
+\begin{figure}
+	\begin{subfigure}[t]{0.5\linewidth}
+	\centering
+	\includegraphics[width = 2.5 in]{figures/fig-rain.eps}
+	\caption{Station locations and log(precip)}
+	\label{qp-precip}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.5\linewidth}
+	%\centering
+	\includegraphics[width = 2.5 in]{figures/fig-elev.eps}
+	\caption{Station locations and elevation.}
+	\label{qp-elev}
+	\end{subfigure}
+\caption{Heat maps showing the locations of the stations in a region of Colorado along with the log of precipitation (\ref{qp-precip}) and elevation (\ref{qp-elev}) at each station.}
+\label{qplots}
+\end{figure}
+
+Colorado has two distinct geographic regions: the mountainous region in the west and the plains region in the east. Figure~\ref{qp-elev} illustrates these two regions, and we can begin to notice a possible relationship between elevation and average precipitation. We explore the potential relationship between precipitation and elevation using scatter plots.
+
+<<label = rain1, results = hide, fig = T, include = F>>==
+plot(CO.elev, log(avg30) , xlab = "Elevation", ylab = "log(precip)",
+main = "Scatter of log(precip) vs. Elevation")
+m1 <- lm( log(avg30) ~ ns(CO.elev, df = 3))
+summary(m1)
+fits <- m1$fitted.values
+bad <- is.na(avg30)
+x <- CO.elev[which(!bad)]
+ord <- order(x)
+x <- sort(x)
+fits <- fits[ord]
+lines(x, fits, lwd = 3, col = "red")
+@
+<<label = rain2, results = hide, fig = T, include = F>>==
+resid <- m1$resid
+hist(resid, freq = F, main = "Histogram of Residuals")
+lines(density(resid), lwd = 2)
+@
+
+\begin{figure}
+	\begin{subfigure}[t]{0.5\linewidth}
+	\centering
+	\includegraphics[width = 2.5 in]{figures/fig-rain1.eps}
+	\caption{log(precip) vs. elevation}
+	\label{elev_scatter}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.5\linewidth}
+	%\centering
+	\includegraphics[width = 2.5 in]{figures/fig-rain2.eps}
+	\caption{histogram of residuals}
+	\label{rhist}
+	\end{subfigure}
+\caption{The plot in Figure~\ref{elev_scatter} displays the scatter plot and the estimate of the nonparametric relationship between log(precipitation) and elevation. Figure~ref{rhist} displays a histogram of the residuals from the model relating log(precipitation) to elevation. }
+\label{rain_model}
+\end{figure}
+
+We fit a cubic smoothing spline via least squares to model the relationship between log(precipitation) and elevation. The estimate is shown in Figure~\ref{elev_scatter}, and the histogram of residuals in Figure~\ref{rhist} indicates that a Gaussian assumption is reasonable. We will use the residuals from this model to check for remaining spatial dependence and potential anisotropy. We use \verb@variog4@ to estimate directional sample semivariograms. 
+
+<< label = precipdv, results = hide, fig = T, include = F>>=
+resid <- m1$residuals
+precip.resid <- cbind(CO.loc[which(!bad),][,1],CO.loc[which(!bad),][,2] , resid)
+geodat <- as.geodata(precip.resid)
+svar4 <- variog4(geodat)
+plot(svar4, legend = F)
+legend("bottomright", legend = c(expression(0*degree), expression(45*degree), expression(90*degree), expression(135*degree)), col = 1:4, lty = 1:4)
+title("Directional Sample Semivariograms")
+@
+
+\begin{figure}
+\begin{center}
+\includegraphics[width = 3.5 in]{figures/fig-precipdv.eps}
+\end{center}
+\caption{Directional sample semivariograms using residuals from the model relating log(precipitation) to elevation.}
+\label{raindv}
+\end{figure}
+
+The increase, followed by a leveling off, of the semivariance values as distance increases in Figure~\ref{raindv} indicates that there is spatial dependence remaining in the data. We notice that the $0^{\circ}$ semivariogram appears to be slightly different than the other three, but there is no attached measure of uncertainty. We again turn to a nonparametric hypothesis test of isotropy to assist in determining if an assumption of isotropy is reasonable. 
+
+There are two testing procedures for non-gridded available in \pkg{spTest}: \citet{guan2004isotropy} and \citet{maity2012test}. To choose between these two, we need to decide whether or not it is reasonable to assume that sampling locations are uniformly distributed on the sampling domain. The methods for non-gridded data from \citet{guan2004isotropy} rely on the assumption that sampling locations are uniformly distributed while the \citet{maity2012test} methods can be used on any general sampling design. To check this assumption, we can turn to methods from the spatial point process literature to perform a test of complete spatial randomness (CSR), i.e., a uniform spatial distribution, for the sampling locations. Methods for testing CSR are available in the \R package \pkg{spatstat} \citep{baddeley2004spatstat}. For brevity, we do not include those results here, and we will proceed assuming that CSR holds for these sampling locations.  
+
+For both \citet{guan2004isotropy} and \citet{maity2012test}, we need to choose the lag set, $\bL$, and the contrast matrix, $\A$. The large jumps and decrease in the semivariance values in Figure~\ref{raindv} indicate that semivariogram estimates become unreliable beyond a distance of 2; thus, we should choose lags having Euclidean distance less than this distance. We choose the lag set 
+\[
+ \bL = \{ \h_1 = (3/4,0), \h_2 = (0,3/4), \h_3 = (3/4,3/4),  \h_4 = (-3/4,3/4)\},
+\]
+and again we use the matrix $\A$ in Equation \eqref{amat}.
+<<label = lags >>=
+mylags <- 0.75 * rbind(c(1,0), c(0,1), c(1,1), c(-1,1))
+myA <- rbind(c(1, -1, 0 , 0), c(0, 0, 1, -1))
+@
+
+The next step is to implement the methods from \citet{guan2004isotropy} and \citet{maity2012test} is to determine the size of the moving windows and the block size, respectively, that will be used in estimating the asymptotic variance-covariance matrix. To make this determination, we need to place a grid over the sampling region. The choice of grid will depend on the density and design of the sampling locations, but, ideally, should divide the region so that uniformly distributed sampling locations are approximately evenly divided between the cells and there are few empty subblocks. We recommend using visualizations of different grid choices to assist in choosing a grid. For our example, we set the limits of the sampling region to be slightly wider than the observed minimum and maximum coordinates in both the $x$ and $y$ directions, and we divide both the x-axis and y-axis into 12 parts. The result of this grid is plotted in Figure~\ref{gridplot}.
+
+<<label = grid, fig = T, include = F>>==
+quilt.plot(precip.resid[,1:2], precip.resid[,3], xlab = "Longitude", ylab = "Latitude")
+title("Quilt Plot of Residuals and Grid Used for Subsampling")
+min(precip.resid[,1])
+max(precip.resid[,1])
+min(precip.resid[,2])
+max(precip.resid[,2])
+#Set the limits of the sampling region to be slightly 
+#larger than the min/max coordinates
+my.xlims <-  c(-109.5, -101)
+my.ylims <-  c(36.5, 41.5)
+xlen <-  my.xlims[2]-my.xlims[1]
+ylen <-  my.ylims[2]-my.ylims[1]
+my.grid.spacing <-  c(xlen/12, ylen/12)
+xgrid <- seq(my.xlims[1], my.xlims[2], by = my.grid.spacing[1])
+ygrid <- seq(my.ylims[1], my.ylims[2], by = my.grid.spacing[2])
+abline(v = xgrid, lty = 2)
+abline(h = ygrid, lty = 2)
+@
+
+\begin{figure}
+\begin{center}
+\includegraphics[width = 3.25 in]{figures/fig-grid.eps}
+\end{center}
+\caption{The grid placed on the sampling region used for spatial resampling. Because the sampling locations are not gridded, it can be difficult to assess isotropy properties via a heat map.}
+\label{gridplot}
+\end{figure}
+
+Now that we have a grid on the sampling region, for the test in \citet{guan2004isotropy}, we need to choose the dimensions of the moving window and the smoothing (bandwidth) parameters. The p-value of the hypothesis test will be sensitive to the choice of moving window dimensions. For this example, the dimensions of the sampling region are $8.5 \times 5$ (width $\times$ height). Thus, we should create a rectangular moving window having a slightly larger width than height. Our window dimensions should also be compatible with the grid placed on the sampling region. Recalling that we placed a $12 \times 12$ grid on the region, a good choice for window dimensions is $4 \times 3$ since these values both evenly divide 12 and create the desired rectangular orientation. Another potential choice for window dimensions is $2 \times 1$, but this may not be a good choice because very few sampling locations will be available in each subblock. The smoothing parameter should be chosen based on the number and density of the sampling locations with larger values inducing higher levels of smoothing, i.e., averaging over all directions. In our experience, smoothing parameter values between 0.25 and 0.9 tend to produce reasonable results; however, the p-value of the hypothesis test will change with the bandwidth. For this example, we choose a bandwidth of 0.6 for smoothing over lags over the entire domain, and a bandwidth of 0.7 for smoothing over lags on the subblocks of data created by the moving window. 
+
+Likewise, for the test in \citet{maity2012test}, we need to choose the block size used to implement the grid-based block bootstrap [GBBB] \citep{lahiri2006resampling}. Like the moving windows, we use a block size of $4 \times 3$. Finally, we need to choose the number of bootstrap resamples that will be used to estimate $\mathbf{\Sigma}$. We recommend using at least 50 bootstrap samples; however, more than 200 bootstrap samples comes with an increase in computation cost. We choose 100 bootstrap samples for our example, and we note that the number of bootstraps does not affect the precision of the p-value, which is computed via the asymptotic $\chi^2$ distribution.
+
+When moving window or block dimensions are not compatible with the number of rows or columns of gridded sampling locations or the dimensions of grid laid on the sampling region for non-gridded locations, the functions in \pkg{spTest} will print a warning message since they do not currently handle partial (incomplete) blocks. Likewise, if the window dimensions are too small, the function \verb@GuanTestUnif@ will discard subblocks that do not have enough sampling locations and print a warning message. The problem of choosing an optimal bandwidth and optimal window/block size remains an open question. See \citet{weller2015} and the original works for guidelines on choosing these values.
+
+Having determined values for the different options, we can now run the hypothesis tests.
+
+<<label = nongrid>>=
+myh <-  0.6
+myh.sb <-  0.7
+tr.guan <- GuanTestUnif(spdata = precip.resid, lagmat = mylags, A = myA, df = 2, h = myh,
+kernel = "norm", truncation = 1.5, xlims = my.xlims, ylims = my.ylims, 
+grid.spacing = my.grid.spacing, window.dims = c(4,3), subblock.h = myh.sb)
+tr.guan$pvalue.chisq
+
+tr.maity <- MaityTest(spdata = precip.resid, lagmat = mylags, A = myA, df = 2, 
+xlims = my.xlims, ylims = my.ylims, grid.spacing = my.grid.spacing, 
+block.dims = c(4,3), nBoot = 100, kappa = 1)
+tr.maity$pvalue.chisq
+@
+
+For both tests, the data do not provide evidence in favor of anisotropy. Thus, in developing a spatial model for these data, it may be reasonable to assume isotropy. 
+%\ding{228}Talk about other assumptions - at least mention there are assumptions which we have not covered for brevity.
+\section{Discussion}\label{discussion}
+Choosing a covariance function is an important step in modeling spatially-referenced data and a variety of choices for the covariance function are available, e.g., anisotropy, nonstationarity, parametric forms. The \R package \pkg{spTest} implements several nonparametric tests for checking isotropy properties which avoid specifying a parametric form for the covariance function. One concern regarding the methods in \pkg{spTest} is that they tend to have low power when the anisotropy is weak \citep[see, e.g.,][]{weller2015}.
+
+We have demonstrated how graphical techniques and the functions in \pkg{spTest} can be used in a complementary role to check for anisotropy. Future work includes extending the functionality of \pkg{spTest} to allow implementing the tests on non-rectangular sampling domains. Additionally, computational efficiency can be improved by programming functions in \texttt{C++}.
+\\
+\\
+\textbf{Acknowledgements}
+\\
+\\
+Weller's work was supported by the National Science Foundation Research Network on Statistics in the Atmospheric and Ocean Sciences (STATMOS) through grant DMS-1106862. We wish to thank the North American Regional Climate Change Assessment Program (NARCCAP) for providing the data used in this paper. NARCCAP is funded by the National Science Foundation (NSF), the U.S. Department of Energy (DoE), the National Oceanic and Atmospheric Administration (NOAA), and the U.S. Environmental Protection Agency Office of Research and Development (EPA).
+
+\newpage
+
+\bibliographystyle{apa}
+\bibliography{spTestReferences}
+
+\end{document}

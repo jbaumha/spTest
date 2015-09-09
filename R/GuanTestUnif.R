@@ -27,9 +27,9 @@
 #'
 #' @return \item{gamma.hat}{A matrix of the spatial lags provided and the semivariogram point estimates at those lags used to construct the test statistic.}
 #' \item{sigma.hat}{The estimate of asymptotic variance-covariance matrix, Sigma, used to construct test statistic.} 
-#' \item{n.subblocks}{The number of moving windows (blocks) used to estimate Sigma.}
+#' \item{n.subblocks}{The number of subblocks created by the moving window used to estimate Sigma.}
 #' \item{test.stat}{The calculated test statistic.}
-#' \item{pvalue.finite}{The approximate, finite-sample adjusted p-value computed by using the moving windows (see Guan et. al. (2004), Section 3.3 for details).}
+#' \item{pvalue.finite}{The approximate, finite-sample adjusted p-value computed by using the subblocks created by the moving windows (see Guan et. al. (2004), Section 3.3 for details).}
 #' \item{pvalue.chisq}{The p-value computed using the asymptotic Chi-sq distribution.}
 #'
 #' @references Guan, Y., Sherman, M., & Calvin, J. A. (2004). A nonparametric test for spatial isotropy using subsampling. \emph{Journal of the American Statistical Association}, 99(467), 810-821.
@@ -85,6 +85,8 @@
 
 GuanTestUnif = function(spdata, lagmat, A, df, h = 1, kernel = "norm", truncation = 1.5, xlims, ylims, grid.spacing = c(1,1), window.dims = c(2,2), subblock.h, sig.est.finite = T)
 {
+	if(!is.matrix(spdata))
+	{stop("spdata must be a matrix")}
 	if(dim(spdata)[2] != 3)
 	{stop("matrix of spatial data (spdata) must have 3 columns")}
 	if(dim(spdata)[1] <= 3)
@@ -173,6 +175,10 @@ GuanTestUnif = function(spdata, lagmat, A, df, h = 1, kernel = "norm", truncatio
 	vol.Dn <- (xlims[2]-xlims[1])*(ylims[2]-ylims[1])
 	
 	npts <- dim(spdata)[1]
+	
+	Mt <- A%*%sigma.hat%*%t(A)
+	if(det(Mt) == 0)
+	{stop("The matrix A%*%sigma.hat%*%t(A) is not invertible. Try using a different lag set for the test.")}
 	
 	test.stat <- vol.Dn*t(A%*%gh) %*% solve(A%*%sigma.hat%*%t(A)) %*% (A%*%gh)
 	test.stat <- test.stat[1,1]

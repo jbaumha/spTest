@@ -4,7 +4,7 @@
 \alias{GuanTestGrid}
 \title{Nonparametric Test of Isotropy Using the Sample Semivariogram}
 \usage{
-GuanTestGrid(spdata, delta = 1, lagmat, A, df, subblock.dims,
+GuanTestGrid(spdata, delta = 1, lagmat, A, df, window.dims,
   pt.est.edge = TRUE, sig.est.edge = TRUE, sig.est.finite = TRUE)
 }
 \arguments{
@@ -18,7 +18,7 @@ GuanTestGrid(spdata, delta = 1, lagmat, A, df, subblock.dims,
 
 \item{df}{A scalar indicating the row rank of A. This value gives the degrees of freedom for the asymptotic Chi-sq distribution used to compute the p-value.}
 
-\item{subblock.dims}{A vector of length two corresponding to the width and height (in number of columns and rows, respectively) of the moving windows used to estimate the asymptotic variance-covariance matrix. If window width does not evenly divide the number of columns of spatial data, some data will be ommited during subsampling, i.e., function does not handle partial windows. Same applies to window height and number of rows of spatial data.}
+\item{window.dims}{A vector of length two corresponding to the width and height (in number of columns and rows, respectively) of the moving windows used to estimate the asymptotic variance-covariance matrix. If window width does not evenly divide the number of columns of spatial data, some data will be ommited during subsampling, i.e., function does not handle partial windows. Same applies to window height and number of rows of spatial data.}
 
 \item{pt.est.edge}{Logical. True corrects for edge effects in the point estimate (see Guan et. al. (2004), Section 4.2.1 for details).}
 
@@ -29,25 +29,25 @@ GuanTestGrid(spdata, delta = 1, lagmat, A, df, subblock.dims,
 \value{
 \item{gamma.hat}{A matrix of the spatial lags provided and the semivariogram point estimates at those lags used to construct the test statistic.}
 \item{sigma.hat}{The estimate of asymptotic variance-covariance matrix, Sigma, used to construct test statistic.}
-\item{n.subblocks}{The number of moving windows (blocks) used to estimate Sigma.}
+\item{n.subblocks}{The number of subblocks created by the moving window used to estimate Sigma.}
 \item{test.stat}{The calculated test statistic.}
-\item{pvalue.finite}{The approximate, finite-sample adjusted p-value computed by using the moving windows (see Guan et. al. (2004), Section 3.3 for details).}
+\item{pvalue.finite}{The approximate, finite-sample adjusted p-value computed by using the subblocks created by the moving windows (see Guan et. al. (2004), Section 3.3 for details).}
 \item{pvalue.chisq}{The p-value computed using the asymptotic Chi-sq distribution.}
 }
 \description{
 This function performs the nonparametric test of isotropy from Guan et. al. (2004) for spatial data with sampling locations on a grid. See Guan et. al. (2004) for more details.
 }
 \details{
-This function currently only supports square and rectangular sampling regions and does not currently support partial blocks. For example, suppose the sampling grid contains 20 columns and 30 rows of data. Then an ideal value of subblock.dims would be (2,3) since its entries evenly divide the number of columns (20) and rows (30), respectively, of data. To preserve the spatial dependence structure, the spatial blocks should have the same shape (i.e. square or rectangle) and orientation as the entire sampling domain.
+This function currently only supports square and rectangular sampling regions and does not currently support partial blocks. For example, suppose the sampling grid contains 20 columns and 30 rows of data. Then an ideal value of window.dims would be (2,3) since its entries evenly divide the number of columns (20) and rows (30), respectively, of data. To preserve the spatial dependence structure, the moving window should have the same shape (i.e. square or rectangle) and orientation as the entire sampling domain.
 
-The parameter 'delta' serves to scale the samplng locations to the integer grid. Thus the lags provided in 'lagmat' are scaled by 'delta'. For example, suppose spatial locations are observed on grid boxes of 0.5 degrees by 0.5 degrees and referenced by longitude and latitude coordinates in degrees. Then, 'delta' should be 0.5 and a spatial lag of (0,1) corresponds to a change in coordinates of (0, 0.5), i.e, moving one sampling location north in the y-direction.
+The parameter 'delta' serves to scale the samplng locations to the integer grid. Thus the lags provided in 'lagmat' are scaled by 'delta' by the function. For example, suppose spatial locations are observed on grid boxes of 0.5 degrees by 0.5 degrees and referenced by longitude and latitude coordinates in degrees. Then, 'delta' should be 0.5 and a spatial lag of (0,1) corresponds to a change in coordinates of (0, 0.5), i.e, moving one sampling location north in the y-direction.
 }
 \examples{
 library(mvtnorm)
 set.seed(1)
 #number of rows and columns
-nr <- 18
-nc <- 12
+nr <- 12
+nc <- 18
 n <- nr*nc
 #Set up the coordinates
 coords <- expand.grid(0:(nr-1), 0:(nc-1))
@@ -67,8 +67,8 @@ z <- t(z)
 mydata <- cbind(coords, z)
 mylags <-  rbind(c(1,0), c(0, 1), c(1, 1), c(-1,1))
 myA <-  rbind(c(1, -1, 0 , 0), c(0, 0, 1, -1))
-tr <- GuanTestGrid(mydata, delta = 1, mylags, myA, subblock.dims = c(3,2),
-pt.est.edge = TRUE, sig.est.edge = TRUE, sig.est.finite = TRUE, df = 2 )
+tr <- GuanTestGrid(mydata, delta = 1, mylags, myA, df = 2, window.dims = c(3,2),
+pt.est.edge = TRUE, sig.est.edge = TRUE, sig.est.finite = TRUE )
 tr
 
 #Simulate data from anisotropic covariance function
@@ -83,8 +83,8 @@ z <-  z-mean(z)
 z <- t(z)
 mydata <- cbind(coords, z)
 #Run the test on the data generated from an anisotropic covariance function
-tr <- GuanTestGrid(mydata, delta = 1, mylags, myA, subblock.dims = c(3,2),
-pt.est.edge = TRUE,sig.est.edge = TRUE, sig.est.finite = TRUE, df = 2 )
+tr <- GuanTestGrid(mydata, delta = 1, mylags, myA, df = 2, window.dims = c(3,2),
+pt.est.edge = TRUE,sig.est.edge = TRUE, sig.est.finite = TRUE)
 tr
 }
 \references{

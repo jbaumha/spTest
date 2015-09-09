@@ -65,6 +65,8 @@
 #' tr
 LuTest = function(spdata, nrows, ncols, test = "complete", nsim = 5000)
 {
+	if(!is.matrix(spdata))
+	{stop("spdata must be a matrix")}
 	if(dim(spdata)[2] != 3)
 	{stop("matrix of spatial data must have 3 columns")}
 	if(dim(spdata)[1] < 10)

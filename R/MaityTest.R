@@ -85,6 +85,8 @@
 #' # tr
 MaityTest = function(spdata, lagmat, A, df, xlims, ylims, grid.spacing = c(1,1), block.dims, nBoot = 100, kappa = 1, user.bandwidth = F, bandwidth = c(1,1))
 {
+	if(!is.matrix(spdata))
+	{stop("spdata must be a matrix")}
 	if(dim(spdata)[2] != 3)
 	{stop("matrix of spatial data must have 3 columns")}
 	if(dim(spdata)[1] <= 3)
@@ -112,9 +114,9 @@ MaityTest = function(spdata, lagmat, A, df, xlims, ylims, grid.spacing = c(1,1),
 	if( (ylims[2]-ylims[1]) <= block.h)
 	{stop("block height must be less than the height of sampling region, check grid.spacing[2] and block.dims[2]")}
 	if( ((xlims[2]-xlims[1])%%block.w) != 0 )
-	{warning("width of blocks does not divide width of sampling region evenly, some data will be ommited during subsampling (function does not handle incomplete subbocks)")}
+	{warning("width of blocks does not divide width of sampling region evenly, some data will be ommited during subsampling (function does not handle incomplete subblocks)")}
 	if( ((ylims[2]-ylims[1])%%block.h) != 0 )
-	{warning("height of blocks does not divide height of sampling region evenly, some data will be ommited during subsampling (function does not handle incomplete subbocks)")}
+	{warning("height of blocks does not divide height of sampling region evenly, some data will be ommited during subsampling (function does not handle incomplete subblocks)")}
 	if(nBoot <= 0)
 	{stop("invalid number of bootstraps")}
 	if(nBoot < 50)
@@ -132,6 +134,9 @@ MaityTest = function(spdata, lagmat, A, df, xlims, ylims, grid.spacing = c(1,1),
 	
 	blk.chats <- est_block_chats(lagmat, spdata, nBoot, block.dims, xlims, ylims, grid.spacing, kappa, user.bandwidth, bandwidth)
 	Vhat <- cov(blk.chats)
+	Mt <- A %*% Vhat %*% t(A)
+	if(det(Mt) == 0)
+	{stop("The matrix A %*% Vhat %*% t(A) is not invertible. Try using a different lag set for the test.")}
 	Tn <-  t(A %*% chat) %*% solve(A %*% Vhat %*% t(A)) %*% (A %*% chat)
 	Tn <- c(Tn)
 
