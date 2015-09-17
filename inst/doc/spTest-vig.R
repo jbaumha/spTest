@@ -7,16 +7,16 @@
 #install.packages("spTest")
 #install.packages("geoR")
 #install.packages("splines")
-library(spTest)
-library(fields)
-library(geoR)
-library(splines)
+library("spTest")
+library("fields")
+library("geoR")
+library("splines")
 
 
 ###################################################
 ### code chunk number 2: narccap
 ###################################################
-data(WRFG)
+data("WRFG")
 image.plot(WRFG$lon-360, WRFG$lat, WRFG$WRFG.NCEP.tas, xlab = "Longitude",
 ylab = "Latitude", main = "Mean WRFG-NCEP Temperatures")
 world(add = T)
@@ -167,7 +167,6 @@ lines(density(resid), lwd = 2)
 ###################################################
 ### code chunk number 15: precipdv
 ###################################################
-resid <- m1$residuals
 precip.resid <- cbind(CO.loc[which(!bad),][,1],CO.loc[which(!bad),][,2] , resid)
 geodat <- as.geodata(precip.resid)
 svar4 <- variog4(geodat)

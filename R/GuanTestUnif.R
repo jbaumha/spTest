@@ -83,7 +83,7 @@
 #'  my.xlims, my.ylims, my.grid,my.windims, myh.sb)
 #' tr
 
-GuanTestUnif = function(spdata, lagmat, A, df, h = 1, kernel = "norm", truncation = 1.5, xlims, ylims, grid.spacing = c(1,1), window.dims = c(2,2), subblock.h, sig.est.finite = T)
+GuanTestUnif = function(spdata, lagmat, A, df, h = 0.7, kernel = "norm", truncation = 1.5, xlims, ylims, grid.spacing = c(1,1), window.dims = c(2,2), subblock.h, sig.est.finite = T)
 {
 	if(!is.matrix(spdata))
 	{stop("spdata must be a matrix")}
@@ -127,8 +127,8 @@ GuanTestUnif = function(spdata, lagmat, A, df, h = 1, kernel = "norm", truncatio
 	{warning("window.dims should be integer values")}
 	if(subblock.h <= 0)
 	{stop("subblock.h must be positive")}
-	if(subblock.h > 1)
-	{warning("recommend subblock.h to be less than 1 to maintain nominal size")}
+	if(h > 1)
+	{warning("recommend h to be less than 1 to maintain nominal size")}
 	#Check window dimensions
 	win.w <- window.dims[1]*grid.spacing[1]
 	win.h <- window.dims[2]*grid.spacing[2]
@@ -180,13 +180,11 @@ GuanTestUnif = function(spdata, lagmat, A, df, h = 1, kernel = "norm", truncatio
 	if(det(Mt) == 0)
 	{stop("The matrix A%*%sigma.hat%*%t(A) is not invertible. Try using a different lag set for the test.")}
 	
-	test.stat <- vol.Dn*t(A%*%gh) %*% solve(A%*%sigma.hat%*%t(A)) %*% (A%*%gh)
+	test.stat <- vol.Dn*h^2*t(A%*%gh) %*% solve(A%*%sigma.hat%*%t(A)) %*% (A%*%gh)
 	test.stat <- test.stat[1,1]
-	if(subblock.h < 1)
-	{
-		test.stat <- vol.Dn*subblock.h^2*t(A%*%gh) %*% solve(A%*%sigma.hat%*%t(A)) %*% (A%*%gh)
-		test.stat <- test.stat[1,1]
-	}
+	#Below is the non-finite sample adjusted test.stat
+	#test.stat <- vol.Dn*t(A%*%gh) %*% solve(A%*%sigma.hat%*%t(A)) %*% (A%*%gh)
+	#test.stat <- test.stat[1,1]
 		
 	blk.sizes <- sig.data$blk.sizes
 	n.blks <- sig.data$n.good.blks
@@ -196,11 +194,6 @@ GuanTestUnif = function(spdata, lagmat, A, df, h = 1, kernel = "norm", truncatio
 	{
 		ghb <- matrix( block.ghats[i,], nrow = n.lags, ncol = 1)
 		ts <- blk.sizes[i]*t(A%*%ghb) %*% solve(A%*%sigma.hat%*%t(A)) %*% (A%*%ghb)
-
-		if(subblock.h < 1)
-		{
-			ts <- blk.vol*subblock.h^2*t(A%*%ghb) %*% solve(A%*%sigma.hat%*%t(A)) %*% (A%*%ghb)
-		}
 		block.test.stats = c(block.test.stats, ts)
 	}
 

@@ -4,7 +4,7 @@
 \alias{GuanTestUnif}
 \title{Nonparametric Test of Isotropy Using the Sample Semivariogram}
 \usage{
-GuanTestUnif(spdata, lagmat, A, df, h = 1, kernel = "norm",
+GuanTestUnif(spdata, lagmat, A, df, h = 0.7, kernel = "norm",
   truncation = 1.5, xlims, ylims, grid.spacing = c(1, 1),
   window.dims = c(2, 2), subblock.h, sig.est.finite = T)
 }
