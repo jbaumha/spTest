@@ -1,6 +1,6 @@
 #' Average temperature from WRFG RCM output from NARCCAP
 #'
-#' A list containing coordinates and averages of yearly average temperatures from a 24-year period of WRFG-NCEP RCM (regional climate model) output on 14606 grid boxes over North America.
+#' A list containing coordinates and averages of yearly average temperatures from a 24-year period of WRFG-NCEP RCM output on 14606 grid boxes over North America (Weather Research and Forecasting - Grell scheme [WRFG] with boundary conditions provided by the National Center for Environmental Prediciton [NCEP] Regional Climate Model [RCM]).
 #' 
 #' @format A list containing five items:
 #' \describe{

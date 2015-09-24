@@ -7,20 +7,20 @@
 coords.aniso(coords, aniso.pars, reverse = FALSE)
 }
 \arguments{
-\item{coords}{An \eqn{n} by \eqn{2} matrix of spatial coordinates.}
+\item{coords}{An \eqn{n \times 2} matrix of spatial coordinates.}
 
 \item{aniso.pars}{A vector of length two containing the anisotropy angle and anisotropy angle, respectively.}
 
-\item{reverse}{Logical. If TRUE the reverse transformation is performed.}
+\item{reverse}{Logical. If \code{reverse = TRUE} the reverse transformation is performed.}
 }
 \value{
-An \eqn{n} by \eqn{2} matrix of transformed coordinates.
+An \eqn{n \times 2} matrix of transformed coordinates.
 }
 \description{
-This is the function \code{\link[geoR]{coords.aniso}} from the R package \strong{geoR}. It transforms or reverse-transforms a set of spatial coordinates in \emph{R^2} according to geometric anisotropy parameters. See \href{http://cran.r-project.org/web/packages/geoR/geoR.pdf}{geoR documentation} for more details.
+This is the function \code{\link[geoR]{coords.aniso}} from the R package \strong{geoR}. It performs the linear transformation or reverse transformation of a set of spatial coordinates in \eqn{R^2} according to geometric anisotropy parameters. See \href{http://cran.r-project.org/web/packages/geoR/geoR.pdf}{geoR documentation} for more details.
 }
 \details{
-Details on the function can be found in the \href{http://cran.r-project.org/web/packages/geoR/geoR.pdf}{geoR documentation}. The function is included in this package to avoid loading the \strong{geoR} package when doing simulations.
+Details on the function can be found in the \href{http://cran.r-project.org/web/packages/geoR/geoR.pdf}{geoR documentation}. The function is included in this package to avoid the necesity of loading the \strong{geoR} package when simulating anisotropic spatial processes.
 }
 \examples{
 #Set parameter values for exponential covariance function

@@ -19,7 +19,7 @@
 WRFG
 }
 \description{
-A list containing coordinates and averages of yearly average temperatures from a 24-year period of WRFG-NCEP RCM (regional climate model) output on 14606 grid boxes over North America.
+A list containing coordinates and averages of yearly average temperatures from a 24-year period of WRFG-NCEP RCM output on 14606 grid boxes over North America (Weather Research and Forecasting - Grell scheme [WRFG] with boundary conditions provided by the National Center for Environmental Prediciton [NCEP] Regional Climate Model [RCM]).
 }
 \details{
 RCM output is available through the North American Regional Climate Change Assessment Program (NARCCAP). Data used for this example are from the WRFG model with NCEP boundary conditions. For the years 1981-2004, grid box temperatures (given by the variable 'tas') are averaged over the entire year. Yearly average temperatures for each grid box were then averaged over the 24 year period to create the matrix WRFG.NCEP.tas.

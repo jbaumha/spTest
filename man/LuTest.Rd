@@ -7,22 +7,22 @@
 LuTest(spdata, nrows, ncols, test = "complete", nsim = 5000)
 }
 \arguments{
-\item{spdata}{An \eqn{n} by \eqn{3} matrix. The first two columns provide \eqn{(x,y)} spatial coordinates. The third column provides data values at the coordinates.}
+\item{spdata}{An \eqn{n \times 3} matrix. The first two columns provide \eqn{(x,y)} spatial coordinates. The third column provides data values at the coordinates.}
 
 \item{nrows}{The number of rows of observed data.}
 
 \item{ncols}{The number of columns of observed data.}
 
-\item{test}{A string taking the value "reflection" or "complete" for a test of reflection or complete symmetry. If 'test' = "complete", a test for complete symmetry is performed after a test of reflection symmetry is performed and both p-values are returned.}
+\item{test}{A string taking the value \code{reflection} or \code{complete} for a test of reflection or complete symmetry. If \code{test = "complete"}, a test for complete symmetry is performed after a test of reflection symmetry is performed and both p-values are returned.}
 
 \item{nsim}{The number simulations used to approximate the sampling distribution of CvM and CvM* from Lu ad Zimmerman (2005).}
 }
 \value{
 \item{pvalue.refl}{The p-value for the test of reflection symmetry computed by the CvM GoF test.}
- \item{pvalue.comp}{If 'test' = "complete", the p-value for the test of complete symmetry computed by using the CvM* GoF test.}
+ \item{pvalue.comp}{If \code{test = "complete"}, the p-value for the test of complete symmetry computed by using the CvM* GoF test.}
 }
 \description{
-This function performs the nonparametric tests of reflection and complete symmetry from Lu and Zimmerman (2005) for spatial data with sampling locations on the integer grid. See Lu and Zimmerman (2005) for more details.
+This function performs the nonparametric tests of reflection and complete symmetry using the periodogram from Lu and Zimmerman (2005) for spatial data with sampling locations on the integer grid. See Lu and Zimmerman (2005) for more details.
 }
 \details{
 The function assumes data are on the integer grid, \eqn{Z^2}. It uses the (unsmoothed) periodogram, the Fourier transform of the sample covariance function, to test symmetry properties.
@@ -31,8 +31,8 @@ The function assumes data are on the integer grid, \eqn{Z^2}. It uses the (unsmo
 library(mvtnorm)
 set.seed(1)
 #Number of rows and columns
-nr <- 18
-nc <- 12
+nr <- 15
+nc <- 15
 n <- nr*nc
 #Set up the coordinates
 coords <- expand.grid(0:(nr-1), 0:(nc-1))
@@ -51,11 +51,11 @@ z <- rmvnorm(1,rep(0,n), R, method = c("chol"))
 z <-  z-mean(z)
 z <- t(z)
 mydata <- cbind(coords, z)
-#Run the test on the data from an isotropic covariance function
+#Run the test on the data from an isotropic (symmetric) covariance function
 tr <- LuTest(mydata, nr, nc, test = "complete", nsim = 1000)
 tr
 
-#Simulate data from anisotropic covariance function
+#Simulate data from anisotropic (non-symmetric) covariance function
 aniso.angle <- pi/4
 aniso.ratio <- 2
 coordsA <- coords.aniso(coords, c(aniso.angle, aniso.ratio))

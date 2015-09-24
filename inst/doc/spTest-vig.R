@@ -47,7 +47,6 @@ y.coord <- unique(my.coords[,2])
 nx <- length(x.coord)
 ny <- length(y.coord)
 tas.mat <- matrix(mydata[,3], nrow = nx, ncol = ny, byrow = F)
-par(mfrow = c(1,2), oma = c(0,0,2,0))
 image.plot(x.coord, y.coord, tas.mat, ylab = "Northing", xlab = "Easting",
 main = "Subset of Temperatures")
 
@@ -87,8 +86,8 @@ summary(m1)
 ###################################################
 resid <- m1$resid
 resid.mat <- matrix(resid, nrow = nx, ncol = ny, byrow = F)
-image.plot(x.coord, y.coord, resid.mat, xlab = "Easting", ylab = "Northing", 
-main = "Heat Map of Residuals")
+image.plot(x.coord, y.coord, resid.mat, xlab = "Easting", ylab = "Northing")
+title("Heat Map of Residuals")
 
 
 ###################################################
@@ -113,20 +112,16 @@ tr$pvalue.finite
 ### code chunk number 11: rain
 ###################################################
 data(COmonthlyMet)
-dim(CO.ppt)
 sub30 <- CO.ppt[74:103,,]
-dim(sub30)
 nstations <- 376
 years <- 1968:1997
 nyears <- length(years)
 yr.avg <- matrix(data = NA, nrow = nstations, ncol = nyears)
-for(i in 1:nyears)
-{
+for(i in 1:nyears){
 	yr.dat <- sub30[i,,]
 	yr.avg[,i] <- apply(yr.dat, 2 , mean, na.rm = T)
 }
 avg30 <- apply(yr.avg, 1, mean, na.rm = T)
-
 quilt.plot(CO.loc, log(avg30), xlab = "Longitude", ylab = "Latitude",
 main = "Quilt Plot of log(precip)")
 US(add = T)
