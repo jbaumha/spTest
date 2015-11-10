@@ -19,7 +19,7 @@
 #'
 #' The parameter \code{delta} serves to scale the samplng locations to the integer grid. Thus the lags provided in \code{lagmat} are automatically scaled by \code{delta} by the function. For example, suppose spatial locations are observed on grid boxes of 0.5 degrees by 0.5 degrees and referenced by longitude and latitude coordinates in degrees. Then, \code{delta} should be 0.5 and a spatial lag of (0,1) corresponds to a change in coordinates of (0, 0.5), i.e., moving one sampling location north in the y-direction.
 #'
-#' @return \item{gamma.hat}{A matrix of the spatial lags provided and the semivariogram point estimates,\eqn{\hat{\gamma}()}, at those lags used to construct the test statistic.}
+#' @return \item{gamma.hat}{A matrix of the spatial lags provided and the semivariogram point estimates,\eqn{\hat{\gamma}()}, at the lags used to construct the test statistic.}
 #' \item{sigma.hat}{The estimate of asymptotic variance-covariance matrix, \eqn{\widehat{\Sigma}}, used to construct the test statistic.}
 #' \item{n.subblocks}{The number of subblocks created by the moving window used to estimate \eqn{\Sigma}.}
 #' \item{test.stat}{The calculated test statistic.}
@@ -76,7 +76,9 @@
 #' tr
 
 GuanTestGrid = function(spdata, delta = 1, lagmat = rbind(c(1,0), c(0, 1), c(1, 1), c(-1,1)), A = rbind(c(1, -1, 0 , 0), c(0, 0, 1, -1)), df = 2, window.dims = c(2,2), pt.est.edge = TRUE, sig.est.edge = TRUE, sig.est.finite = TRUE)
-{
+{	
+	dname <- deparse(substitute(spdata))
+	
 	if(!is.matrix(spdata))
 	{stop("spdata must be a matrix")}
 	if(dim(spdata)[2] != 3)
@@ -163,7 +165,11 @@ GuanTestGrid = function(spdata, delta = 1, lagmat = rbind(c(1,0), c(0, 1), c(1, 
 	pvalue.finite <- sum(block.test.stats >= test.stat)/n.blks
 	
 	pvalue.chisq <-  pchisq(test.stat, df, lower.tail = F)
-
+	
 	rv <- list("gamma.hat" = gamma.hat, "sigma.hat" = sigma.hat, "n.subblocks" = n.blks, "test.stat" = test.stat,"pvalue.finite" = pvalue.finite, "pvalue.chisq" =
 	pvalue.chisq)
+	
+	htestIso.GG <- make_htestIso_GG(rv, df)
+	htestIso.GG$data.name <- dname
+	return(htestIso.GG)
 }

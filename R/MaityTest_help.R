@@ -1,4 +1,44 @@
 #' @keywords internal
+make_htestIso_MS <- function(HTout, df)
+{
+	nv <- 0
+	names(nv) <- "difference in directional covariograms"
+
+	mya <- "two-sided"
+	names(mya) <- "difference in directional covariogram"
+
+	mmeth <- "Test of isotropy from Maity and Sherman (2012) for sampling locations with general sampling design using the sample covariogram."
+	names(mmeth) <- "method"
+
+	myest <- c(HTout$C.hat[,3])
+	nlags <- length(c(myest))
+	tmp <- character()
+	for(i in 1:nlags)
+	{
+		tmp <- c(tmp, paste("(",as.character(HTout$C.hat[i,1]),",",as.character(HTout$C.hat[i,2]) ,")", sep = ""))
+	}
+	names(myest) <- tmp
+
+	myts <- HTout$test.stat
+	names(myts) <- "Chi-sq"
+
+	mparms <- df
+	names(mparms) <- "df"
+
+	mpv1 <- HTout$pvalue.chisq
+	names(mpv1) <- "p.value.chisq"
+
+	msh <- HTout$V.hat
+
+	obj <- list(null.value = nv, alternative = "two.sided",
+method = mmeth, estimate = myest,
+statistic = myts, parameter = mparms, p.value = mpv1, sigma.hat = msh, p.value.refl = NULL, p.value.comp = NULL) 
+
+		class(obj) <- c("htestIso")		
+		return(obj)
+}
+
+#' @keywords internal
 lag_dist_prod = function(spdata)
 {
 	locs <- spdata[,1:2]

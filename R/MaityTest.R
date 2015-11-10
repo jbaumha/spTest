@@ -87,6 +87,8 @@
 #' # tr
 MaityTest = function(spdata, lagmat, A, df, xlims, ylims, grid.spacing = c(1,1), block.dims, nBoot = 100, kappa = 1, user.bandwidth = F, bandwidth = c(1,1))
 {
+	dname <- deparse(substitute(spdata))
+	
 	if(!is.matrix(spdata))
 	{stop("spdata must be a matrix")}
 	if(dim(spdata)[2] != 3)
@@ -146,8 +148,8 @@ MaityTest = function(spdata, lagmat, A, df, xlims, ylims, grid.spacing = c(1,1),
 	pval.chisq <- c(pval.chisq)
 
 	rv <- list("C.hat" = chat.mat, "V.hat" = Vhat, "n.boot" = nBoot, "test.stat" = Tn, "pvalue.chisq" = pval.chisq )
-	return(rv)
+	
+	htestIso.MS <- make_htestIso_MS(rv, df)
+	htestIso.MS$data.name <- dname
+	return(htestIso.MS)
 }
-
-
-

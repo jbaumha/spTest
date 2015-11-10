@@ -1,4 +1,25 @@
 #' @keywords internal
+make_htestIso_LZ <- function(HTout, df)
+{
+	mmeth <- "Test of reflection and complete symmetry from Lu and Zimmerman (2005) for sampling locations on the integer grid using the perdiodogram."
+	names(mmeth) <- "method"
+
+	mpv1 <- HTout$pvalue.refl
+	names(mpv1) <- "p.value.refl"
+	
+	if( !is.null(HTout$pvalue.comp))
+	{
+		 mpv2 <- HTout$pvalue.comp
+		 names(mpv2) <- "p.value.comp"
+	}
+
+	obj <- list(method = mmeth, p.value.refl = mpv1, p.value.comp = mpv2)
+
+	class(obj) <- c("htestIso")		
+	return(obj)
+}
+
+#' @keywords internal
 scale_coords = function(spdata)
 {
 	min.x <- min(spdata[,1])

@@ -249,7 +249,7 @@ myA <-  rbind(c(1, -1, 0 , 0), c(0, 0, 1, -1))
 tr <- GuanTestGrid(spdata = mydata, delta = my.delta, lagmat = mylags, A = myA,
  window.dims = c(2,2),pt.est.edge = TRUE, sig.est.edge = TRUE, 
  sig.est.finite = TRUE, df = 2 )
-tr$pvalue.finite
+tr$p.value.finite
 @
 
 As expected, the results of the hypothesis test ($p$~value $< 0.05$) indicate that the data exhibit anisotropy. We note that the $p$~value is given as exactly 0 due to a finite sample correction \citep{guan2004isotropy}. The function \verb@GuanTestGrid@, and other functions in \pkg{spTest}, return a $p$~value for the test and information used in computing the $p$~value, such as the point estimates ($\widehat{\G}_n$), estimates of the asymptotic variance-covariance matrix ($\widehat{\mathbf{\Sigma}}$), the number of subblocks used to estimate $\mathbf{\Sigma}$, and other information about the estimation process. Here we note that the point estimates for the directional semivariance are slightly different between the functions from the \pkg{spTest} and \pkg{geoR} packages due to different kernel methods used in estimation.
@@ -300,7 +300,7 @@ The clusters of similar values in the heat map of Figure~\ref{hm2}, and the incr
 tr <- GuanTestGrid(spdata = resid.dat, delta = my.delta, lagmat = mylags, A = myA,
  window.dims = c(2,2),pt.est.edge = TRUE, sig.est.edge = TRUE, 
  sig.est.finite = TRUE, df = 2 )
-tr$pvalue.finite
+tr$p.value.finite
 @
 
 Here the residuals do not provide evidence for anisotropy ($p$~value $> 0.05$). These results suggest that it may be appropriate to choose an isotropic covariance function to model the residuals. However, it is important to note that we have not included the effect of other potentially influential covariates such as elevation or water cover in the model for temperature. Additionally, although we examined a $20 \times 20$ subset of the data, the grid boxes still cover a large geographic region of the U.S., and thus an assumption of stationarity, which is needed for the asymptotic properties of the hypothesis test to hold, may not be reasonable.
@@ -463,12 +463,12 @@ myh.sb <-  0.7
 tr.guan <- GuanTestUnif(spdata = precip.resid, lagmat = mylags, A = myA, df = 2, h = myh,
 kernel = "norm", truncation = 1.5, xlims = my.xlims, ylims = my.ylims, 
 grid.spacing = my.grid.spacing, window.dims = c(4,3), subblock.h = myh.sb)
-tr.guan$pvalue.chisq
+tr.guan$p.value
 
 tr.maity <- MaityTest(spdata = precip.resid, lagmat = mylags, A = myA, df = 2, 
 xlims = my.xlims, ylims = my.ylims, grid.spacing = my.grid.spacing, 
 block.dims = c(4,3), nBoot = 100, kappa = 1)
-tr.maity$pvalue.chisq
+tr.maity$p.value
 @
 
 For both tests, the residuals do not provide evidence in favor of anisotropy. Thus, in developing a spatial model for the residuals, it may be reasonable to assume isotropy. 

@@ -65,6 +65,8 @@
 #' tr
 LuTest = function(spdata, nrows, ncols, test = "complete", nsim = 5000)
 {
+	dname <- deparse(substitute(spdata))
+
 	if(!is.matrix(spdata))
 	{stop("spdata must be a matrix")}
 	if(dim(spdata)[2] != 3)
@@ -88,7 +90,7 @@ LuTest = function(spdata, nrows, ncols, test = "complete", nsim = 5000)
 	
 	if(test == "reflection")
 	{
-		rv <- list("pvalue.refl" = pvalue.refl)
+		rv <- list("pvalue.refl" = pvalue.refl, pvalue.comp = NULL)
 		return(rv)
 	}
 
@@ -97,6 +99,10 @@ LuTest = function(spdata, nrows, ncols, test = "complete", nsim = 5000)
 		pvalue.comp <- test_complete_sym(pe, nsim)
 		rv <- list("pvalue.refl" = pvalue.refl, "pvalue.comp" = pvalue.comp)
 	}
+	
+	htestIso.LZ <- make_htestIso_LZ(rv, df = NULL)
+	htestIso.LZ$data.name <- dname
+	return(htestIso.LZ)
 }
 
 

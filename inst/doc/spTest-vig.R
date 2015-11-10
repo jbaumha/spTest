@@ -69,7 +69,7 @@ myA <-  rbind(c(1, -1, 0 , 0), c(0, 0, 1, -1))
 tr <- GuanTestGrid(spdata = mydata, delta = my.delta, lagmat = mylags, A = myA,
  window.dims = c(2,2),pt.est.edge = TRUE, sig.est.edge = TRUE, 
  sig.est.finite = TRUE, df = 2 )
-tr$pvalue.finite
+tr$p.value.finite
 
 
 ###################################################
@@ -105,7 +105,7 @@ title("Directional Sample Semivariograms")
 tr <- GuanTestGrid(spdata = resid.dat, delta = my.delta, lagmat = mylags, A = myA,
  window.dims = c(2,2),pt.est.edge = TRUE, sig.est.edge = TRUE, 
  sig.est.finite = TRUE, df = 2 )
-tr$pvalue.finite
+tr$p.value.finite
 
 
 ###################################################
@@ -207,11 +207,11 @@ myh.sb <-  0.7
 tr.guan <- GuanTestUnif(spdata = precip.resid, lagmat = mylags, A = myA, df = 2, h = myh,
 kernel = "norm", truncation = 1.5, xlims = my.xlims, ylims = my.ylims, 
 grid.spacing = my.grid.spacing, window.dims = c(4,3), subblock.h = myh.sb)
-tr.guan$pvalue.chisq
+tr.guan$p.value
 
 tr.maity <- MaityTest(spdata = precip.resid, lagmat = mylags, A = myA, df = 2, 
 xlims = my.xlims, ylims = my.ylims, grid.spacing = my.grid.spacing, 
 block.dims = c(4,3), nBoot = 100, kappa = 1)
-tr.maity$pvalue.chisq
+tr.maity$p.value
 
 

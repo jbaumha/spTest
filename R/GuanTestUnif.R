@@ -21,7 +21,7 @@
 #'
 #' @details This function currently only supports square and rectangular sampling regions and does not support partial blocks. For example, suppose the sampling region runs from 0 to 20 in the x-direction and from 0 to 30 in the y-direction and an underlying grid of 1 by 1 is laid over the sampling region. Then an ideal value of \code{window.dims} would be (2,3) since its entries evenly divide the width (20) and height (30), respectively, of the sampling region. Using \code{window.dims} (3, 4.5) would imply that some data will not be used in the moving windows since these values would create partial blocks in the sampling region.
 #'
-#'The value \code{window.dims} provides the width and height of the moving window in terms of the underlying grid laid on the sampling region. For example, if a grid with dimensions of grid.spacing = c(0.1, 0.2) is laid on the sampling region and window.dims = c(2,3) then the dimensions of the subblocks created by the moving windows are (0.2, 0.6). Thus, the user must take care to ensure that the values of \code{grid.spacing} and \code{window.dims} are compatible with the dimensions of the sampling region. The easiest way to meet this constrain is to make the \code{grid.spacing} values a function of the \code{xlims} and \code{ylims} values. For example, to put down a \eqn{10 \times 10} grid on the domain, use \code{grid.spacing = (xlims[2]-xlims[1], ylim[2]-ylims[1])/10}. Then, setting \code{window.dims = c(2,2)} ensures that no data will be omitted during thes subsampling.
+#'The value \code{window.dims} provides the width and height of the moving window in terms of the underlying grid laid on the sampling region. For example, if a grid with dimensions of grid.spacing = c(0.1, 0.2) is laid on the sampling region and window.dims = c(2,3) then the dimensions of the subblocks created by the moving windows are (0.2, 0.6). Thus, the user must take care to ensure that the values of \code{grid.spacing} and \code{window.dims} are compatible with the dimensions of the sampling region. The easiest way to meet this constrain is to make the \code{grid.spacing} values a function of the \code{xlims} and \code{ylims} values. For example, to put down a \eqn{10 \times 10} grid on the domain, use \code{grid.spacing = (xlims[2]-xlims[1], ylim[2]-ylims[1])/10}. Then, setting \code{window.dims = c(2,2)} ensures that no data will be omitted during the subsampling.
 #'
 #'To preserve the spatial dependence structure, the moving window should have the same shape (i.e. square or rectangle) and orientation as the entire sampling domain.
 #'
@@ -67,24 +67,28 @@
 #'  my.xlims, my.ylims, my.grid,my.windims, myh.sb)
 #' tr
 #'
+#'
+#' ##Not run ##
 #' #Simulate data from anisotropic covariance function
-#' aniso.angle <- pi/4
-#' aniso.ratio <- 2
-#' coordsA <- coords.aniso(coords, c(aniso.angle, aniso.ratio))
-#' Da <- as.matrix(dist(coordsA))
-#' R <- sigma.sq * exp(-phi*Da)
-#' R <- R + diag(tau.sq, nrow = N, ncol = N)
-#' z <- rmvnorm(1,rep(0,N), R, method = c("chol"))
-#' z <-  z-mean(z)
-#' z <- t(z)
-#' mydata <- cbind(coords, z)
+#' #aniso.angle <- pi/4
+#' #aniso.ratio <- 2
+#' #coordsA <- coords.aniso(coords, c(aniso.angle, aniso.ratio))
+#' #Da <- as.matrix(dist(coordsA))
+#' #R <- sigma.sq * exp(-phi*Da)
+#' #R <- R + diag(tau.sq, nrow = N, ncol = N)
+#' #z <- rmvnorm(1,rep(0,N), R, method = c("chol"))
+#' #z <-  z-mean(z)
+#' #z <- t(z)
+#' #mydata <- cbind(coords, z)
 #' #Run the test on the data generated from an anisotropic covariance function
-#' tr <- GuanTestUnif(mydata, mylags, myA, df = 2, myh, "norm", 1.5,
-#'  my.xlims, my.ylims, my.grid,my.windims, myh.sb)
-#' tr
+#' #tr <- GuanTestUnif(mydata, mylags, myA, df = 2, myh, "norm", 1.5,
+#' # my.xlims, my.ylims, my.grid,my.windims, myh.sb)
+#' #tr
 
 GuanTestUnif = function(spdata, lagmat, A, df, h = 0.7, kernel = "norm", truncation = 1.5, xlims, ylims, grid.spacing = c(1,1), window.dims = c(2,2), subblock.h = h, sig.est.finite = TRUE)
 {
+	dname <- deparse(substitute(spdata))
+
 	if(!is.matrix(spdata))
 	{stop("spdata must be a matrix")}
 	if(dim(spdata)[2] != 3)
@@ -202,4 +206,8 @@ GuanTestUnif = function(spdata, lagmat, A, df, h = 0.7, kernel = "norm", truncat
 	pvalue.chisq <- pchisq(test.stat, df, lower.tail = F)
 	
 	rv <- list("gamma.hat" = gamma.hat, "sigma.hat" = sigma.hat, "n.subblocks" = n.blks, "test.stat" = test.stat,"pvalue.finite" = pvalue.finite, "pvalue.chisq" = pvalue.chisq)
+	
+	htestIso.GU <- make_htestIso_GU(rv, df)
+	htestIso.GU$data.name <- dname
+	return(htestIso.GU)
 }

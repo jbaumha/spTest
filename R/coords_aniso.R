@@ -6,7 +6,7 @@
 #'@keywords external
 #'
 #' @param coords An \eqn{n \times 2} matrix of spatial coordinates.
-#' @param aniso.pars A vector of length two containing the anisotropy angle and anisotropy angle, respectively.
+#' @param aniso.pars A vector of length two containing the anisotropy angle and anisotropy ratio, respectively.
 #' @param reverse Logical. If \code{reverse = TRUE} the reverse transformation is performed.
 #'
 #' @details Details on the function can be found in the \href{http://cran.r-project.org/web/packages/geoR/geoR.pdf}{geoR documentation}. The function is included in this package to avoid the necesity of loading the \strong{geoR} package when simulating anisotropic spatial processes.
