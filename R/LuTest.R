@@ -5,14 +5,14 @@
 #' @export
 #' @keywords external
 #'
-#' @param spdata An \eqn{n \times 3} matrix. The first two columns provide \eqn{(x,y)} spatial coordinates. The third column provides data values at the coordinates.
+#' @param spdata An \eqn{n \times 3}{n x 3} matrix. The first two columns provide \eqn{(x,y)}{(x,y)} spatial coordinates. The third column provides data values at the coordinates. This argument can also be an object of class \code{\link[geoR]{geodata}} from the package \pkg{geoR}, or of class \code{SpatialGridDataFame} or \code{SpatialPixelsDataFame} from the package \pkg{sp}. If the class is  \code{SpatialPixelsDataFame}, then the parameters \code{nrows} and \code{ncols} are extracted from the grid attributes.
 #'
 #' @param nrows	The number of rows of observed data.
 #' @param ncols	The number of columns of observed data.
 #' @param test	A string taking the value \code{reflection} or \code{complete} for a test of reflection or complete symmetry. If \code{test = "complete"}, a test for complete symmetry is performed after a test of reflection symmetry is performed and both p-values are returned.
 #' @param nsim	The number simulations used to approximate the sampling distribution of CvM and CvM* from Lu ad Zimmerman (2005).
 #'
-#' @details The function assumes data are on the integer grid, \eqn{Z^2}. It uses the (unsmoothed) periodogram, the Fourier transform of the sample covariance function, to test symmetry properties.
+#' @details The function assumes data are on the integer grid, \eqn{Z^2}{Z-squared}. It uses the (unsmoothed) periodogram, the Fourier transform of the sample covariance function, to test symmetry properties.
 #'
 #' @return \item{pvalue.refl}{The p-value for the test of reflection symmetry computed by the CvM GoF test.}
 #'  \item{pvalue.comp}{If \code{test = "complete"}, the p-value for the test of complete symmetry computed by using the CvM* GoF test.}
@@ -48,6 +48,7 @@
 #' tr <- LuTest(mydata, nr, nc, test = "complete", nsim = 1000)
 #' tr
 #'
+#' library(geoR)
 #' #Simulate data from anisotropic (non-symmetric) covariance function
 #' aniso.angle <- pi/4
 #' aniso.ratio <- 2
@@ -63,10 +64,30 @@
 #' #(and non reflection and non completely symmetric) covariance function
 #' tr <- LuTest(mydata, nr, nc, test = "complete", nsim = 1000)
 #' tr
-LuTest = function(spdata, nrows, ncols, test = "complete", nsim = 5000)
+LuTest = function(spdata, nrows = 10, ncols = 10, test = "complete", nsim = 5000)
 {
 	dname <- deparse(substitute(spdata))
-
+	spdata.class <- class(spdata)
+	if(spdata.class == "geodata")
+	{
+		spdata <- cbind(spdata$coords, spdata$data)
+	}
+	if(spdata.class == "SpatialGridDataFrame")
+	{
+		spdata <- cbind(coordinates(spdata), spdata[[1]])
+	}
+	if(spdata.class == "SpatialPixelsDataFrame")
+	{
+		spdata <- cbind(coordinates(spdata), spdata[[1]])
+		delta.x <- summary(spdata)$grid[1,2]
+		if(delta.x != 1)
+		{stop("function assumes integer grid: spacing between X locations is not 1")}
+		delta.y <- summary(spdata)$grid[1,2]
+		if(delta.y != 1)
+		{stop("function assumes integer grid: spacing between Y locations is not 1")}
+		ncols <- summary(spdata)$grid[1,3]
+		nrows <- summary(spdata)$grid[2,3]
+	}
 	if(!is.matrix(spdata))
 	{stop("spdata must be a matrix")}
 	if(dim(spdata)[2] != 3)

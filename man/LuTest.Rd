@@ -4,10 +4,10 @@
 \alias{LuTest}
 \title{Nonparametric Test of Symmetry Using the Periodogram}
 \usage{
-LuTest(spdata, nrows, ncols, test = "complete", nsim = 5000)
+LuTest(spdata, nrows = 10, ncols = 10, test = "complete", nsim = 5000)
 }
 \arguments{
-\item{spdata}{An \eqn{n \times 3} matrix. The first two columns provide \eqn{(x,y)} spatial coordinates. The third column provides data values at the coordinates.}
+\item{spdata}{An \eqn{n \times 3}{n x 3} matrix. The first two columns provide \eqn{(x,y)}{(x,y)} spatial coordinates. The third column provides data values at the coordinates. This argument can also be an object of class \code{\link[geoR]{geodata}} from the package \pkg{geoR}, or of class \code{SpatialGridDataFame} or \code{SpatialPixelsDataFame} from the package \pkg{sp}. If the class is  \code{SpatialPixelsDataFame}, then the parameters \code{nrows} and \code{ncols} are extracted from the grid attributes.}
 
 \item{nrows}{The number of rows of observed data.}
 
@@ -25,7 +25,7 @@ LuTest(spdata, nrows, ncols, test = "complete", nsim = 5000)
 This function performs the nonparametric tests of reflection and complete symmetry using the periodogram from Lu and Zimmerman (2005) for spatial data with sampling locations on the integer grid. See Lu and Zimmerman (2005) for more details.
 }
 \details{
-The function assumes data are on the integer grid, \eqn{Z^2}. It uses the (unsmoothed) periodogram, the Fourier transform of the sample covariance function, to test symmetry properties.
+The function assumes data are on the integer grid, \eqn{Z^2}{Z-squared}. It uses the (unsmoothed) periodogram, the Fourier transform of the sample covariance function, to test symmetry properties.
 }
 \examples{
 library(mvtnorm)
@@ -55,6 +55,7 @@ mydata <- cbind(coords, z)
 tr <- LuTest(mydata, nr, nc, test = "complete", nsim = 1000)
 tr
 
+library(geoR)
 #Simulate data from anisotropic (non-symmetric) covariance function
 aniso.angle <- pi/4
 aniso.ratio <- 2
