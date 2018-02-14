@@ -112,4 +112,3 @@ Lahiri, S. N., & Zhu, J. (2006). Resampling methods for spatial regression model
 \code{\link{GuanTestUnif}}
 }
 \keyword{external}
-

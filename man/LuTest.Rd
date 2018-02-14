@@ -79,4 +79,3 @@ Lu, N., & Zimmerman, D. L. (2005). Testing for directional symmetry in spatial d
 \code{\link{GuanTestGrid}}
 }
 \keyword{external}
-

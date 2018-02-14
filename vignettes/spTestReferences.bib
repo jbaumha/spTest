@@ -1,36 +1,115 @@
-%% This BibTeX bibliography file was created using BibDesk.
-%% http://bibdesk.sourceforge.net/
-
-
 %% Created for Zachary Weller at 2014-10-24 14:11:46 -0600 
+@article{spTestJSS,
+  title        = {{spTest}: An {R} Package Implementing Nonparametric Tests of Isotropy},
+  author        = {Zachary D. Weller},
+  journal      = {Journal of Statistical Software},
+  year         =  {2018},
+  volume       = {83},
+  number       = {4},
+  pages        = {1--24},
+  doi          = {10.18637/jss.v083.i04}
+}
 
+@ARTICLE{weller2015,
+    AUTHOR = {Zachary D. Weller and Jennifer A. Hoeting},
+     TITLE = {A Review of Nonparametric Hypothesis Tests of Isotropy Properties in Spatial Data},
+   JOURNAL = {Statist. Sci.},
+  FJOURNAL = {Statistical Science},
+      YEAR = {2016},
+    VOLUME = {31},
+    NUMBER = {3},
+     PAGES = {305-324},
+      ISSN = {0883-4237},
+       DOI = {10.1214/16-STS547},
+      SICI = {0883-4237(2016)31:3<305:ARONHT>2.0.CO;2-Z},
+}
+
+@misc{wellerGIT,
+	author = {Weller, Zachary D.},
+	title = {spTest-JSS-Code},
+	year = {2016},
+	publisher = {GitHub},
+	journal = {GitHub Repository},
+	howpublished = {https://github.com/zdweller/spTest-JSS-Code/blob/master/spTest-JSS-Code-script},
+	commit = {521fbab},
+}
+
+@misc{wellerGIT2,
+	author = {Weller, Zachary D.},
+	title = {read-WRFG-data},
+	year = {2016},
+	publisher = {GitHub},
+	journal = {GitHub Repository},
+	howpublished = {https://github.com/zdweller/Read-NARCCAP/blob/master/read-WRFG-data},
+	commit = {33f2026},
+}
 
 %% Saved with string encoding Unicode (UTF-8) 
   @Manual{spTest,
-    title = {spTest: Nonparametric Hypothesis Tests of Isotropy and Symmetry},
-    author = {Zachary D. Weller},
-    year = {2015},
-    note = {R package version 0.2.1},
+    title = { \pkg{sp{T}est}: Nonparametric Hypothesis Tests of Isotropy and Symmetry},
+    author = {Weller, Zachary D.},
+    year = {2016},
+    note = {\proglang{R}~package version~0.2.4},
+    url = {http://CRAN.R-project.org/package=spTest},
   }
   
-  @article{weller2015,
-	Author = {Weller, Zachary D. and Hoeting, J.A.},
-	Title = {A Review of Nonparametric Hypothesis Tests of Isotropy Properties in Spatial Data},
-	Year = {2015},
-	Journal = {submitted to Statistical Science, available on arXiv},
-	url = {http://arxiv.org/abs/1508.05973}
-}
-  
-@Manual{fields,
-    title = {fields: Tools for spatial data},
-    author = {Douglas Nychka and Reinhard Furrer and Stephan Sain},
+  @Manual{fields,
+    title = {\pkg{fields}: Tools for Spatial Data},
+    author = {Douglas Nychka and Reinhard Furrer and John Paige and Stephan Sain},
     year = {2014},
-    note = {R package version 7.1},
+    note = {\proglang{R}~package version~8.3-5},
     url = {http://CRAN.R-project.org/package=fields},
   }
 
+   @Manual{splines,
+    title = {\proglang{R}: A Language and Environment for Statistical Computing},
+    author = {{\proglang{R} Core Team}},
+    organization = {\proglang{R}~Foundation for Statistical Computing},
+    address = {Vienna, Austria},
+    year = {2015},
+    url = {http://www.R-project.org/},
+  }
+  
+  %%%%%%%%
+@Manual{rsoftware,
+    title = {\proglang{R}: A Language and Environment for Statistical Computing},
+    author = {{\proglang{R} Core Team}},
+    organization = {\proglang{R} Foundation for Statistical Computing},
+    address = {Vienna, Austria},
+    year = {2015},
+    url = {http://www.R-project.org/},
+  }
+
+ @Manual{smpackage,
+    title = {\proglang{R} Package \pkg{sm}: Nonparametric Smoothing Methods },
+    author = {A. W. Bowman and A. Azzalini},
+    address = {University of Glasgow, UK and Universit\`a di Padova, Italia},
+    year = {2014},
+    note = {\proglang{R}~package version~2.2-5.4)},
+    url = {URL http://www.stats.gla.ac.uk/~adrian/sm, http://azzalini.stat.unipd.it/Book_sm}
+    }
+    
+ @Book{mass,
+    title = {Modern Applied Statistics with S},
+    author = {W. N. Venables and B. D. Ripley},
+    publisher = {Springer-Verlag},
+    edition = {Fourth},
+    address = {New York},
+    year = {2002},
+    note = {ISBN 0-387-95457-0},
+    url = {http://www.stats.ox.ac.uk/pub/MASS4},
+  }
+
+@Manual{rgdal,
+    title = {\pkg{rgdal}: Bindings for the Geospatial Data Abstraction Library},
+    author = {Roger Bivand and Tim Keitt and Barry Rowlingson},
+    year = {2016},
+    note = {\proglang{R}~package version~1.1-9},
+    url = {https://CRAN.R-project.org/package=rgdal},
+  }
+
 @article{geoR,
-     title         = {{geoR}: a package for geostatistical analysis},
+     title         = {{\pkg{geoR}}: A Package for Geostatistical Analysis},
      author        = {Ribeiro Jr., P.J. and Diggle, P.J.},
      journal       = {R-NEWS},
      year          = {2001},
@@ -40,18 +119,9 @@
      issn          = {1609-3631},
      url           = {http://cran.R-project.org/doc/Rnews}
  }
- 
-   @Manual{splines,
-    title = {R: A Language and Environment for Statistical Computing},
-    author = {{R Core Team}},
-    organization = {R Foundation for Statistical Computing},
-    address = {Vienna, Austria},
-    year = {2015},
-    url = {http://www.R-project.org/},
-  }
   
   @article{mearns2009regional,
-  title={A regional climate change assessment program for North America},
+  title={A Regional Climate Change Assessment Program for North America},
   author={Mearns, Linda O and Gutowski, William and Jones, Richard and Leung, Ruby and McGinnis, Seth and Nunes, Ana and Qian, Yun},
   journal={Eos, Transactions American Geophysical Union},
   volume={90},
@@ -61,14 +131,80 @@
   publisher={Wiley Online Library}
 }
 
-@misc{baddeley2004spatstat,
-  title={Spatstat: An R Package for Analyzing Spatial Point Pattens},
+@article{baddeley2004spatstat,
+  title={ \pkg{spatstat}: An \proglang{R} Package for Analyzing Spatial Point Pattens},
   author={Baddeley, Adrian J and Turner, Rolf},
-  year={2004},
-  publisher={University of Western Australia. Department of Mathematics and Statistics}
+  journal = {Journal of Statistical Software},
+  volume = {12},
+  issue = {6},
+  year={2005}
 }
 
+ %%%%%%%%%%
+@article{gelfand2016spatial,
+  title={Spatial Statistics and Gaussian Processes: A Beautiful Marriage},
+  author={Gelfand, Alan E and Schliep, Erin M},
+  journal={Spatial Statistics},
+  year={2016},
+  publisher={Elsevier}
+}
 
+  %%%%%%%%%%
+  @book{stein1999interpolation,
+  title={Interpolation of spatial data},
+  author={Stein, Michael L},
+  year={1999},
+  publisher={Springer}
+}
+
+%Short lags: important for prediction
+@article{stein1988asymptotically,
+  title={Asymptotically efficient prediction of a random field with a misspecified covariance function},
+  author={Stein, Michael L},
+  journal={The Annals of Statistics},
+  volume={16},
+  number={1},
+  pages={55--63},
+  year={1988},
+  publisher={Institute of Mathematical Statistics}
+}
+
+%Optimal block size -- mention at least
+@article{sherman1996variance,
+  title={Variance estimation for statistics computed from spatial lattice data},
+  author={Sherman, Michael},
+  journal={Journal of the Royal Statistical Society. Series B (Methodological)},
+  pages={509--523},
+  year={1996},
+  publisher={JSTOR}
+}
+
+%optimal bandwidth in the case of isotropic process
+@article{garcia2004nonparametric,
+  title={Nonparametric kernel estimation of an isotropic variogram},
+  author={Garc{\'i}a-Soid{\'a}n, Pilar H and Febrero-Bande, Manuel and Gonz{\'a}lez-Manteiga, Wenceslao},
+  journal={Journal of Statistical Planning and Inference},
+  volume={121},
+  number={1},
+  pages={65--92},
+  year={2004},
+  publisher={Elsevier}
+}
+
+%Looks at bandwidth selection for nonparametric variogram, but in the case of
+%"nearly infill" asymptotics
+@article{kim2012nonparametric,
+  title={On nonparametric variogram estimation},
+  author={Kim, Tae Yoon and Park, Jeong-Soo},
+  journal={Journal of the Korean Statistical Society},
+  volume={41},
+  number={3},
+  pages={399--413},
+  year={2012},
+  publisher={Elsevier}
+}
+  
+  %%%%%%%%
 
 @article{sampsonNS,
 	Author = {Sampson, Paul D},
@@ -88,7 +224,7 @@
 	Number = {1},
 	Pages = {123--132},
 	Publisher = {Elsevier},
-	Title = {Inferences from fluctuations in the local variogram about the assumption of stationarity in the variance},
+	Title = {Inferences From Fluctuations in the Local Variogram About the Assumption of Stationarity in the Variance},
 	Volume = {143},
 	Year = {2008}}
 	
@@ -103,6 +239,13 @@
   publisher={Wiley Online Library}
 }
 
+@article{bandyopadhyay2015test,
+  title={A Test for Stationarity for Irregularly Spaced Spatial Data},
+  author={Bandyopadhyay, Soutir and Rao, Suhasini Subba},
+  journal={Journal of the Royal Statistical Society (B)},
+  year={2015}
+}
+
 @article{fuentesNStest,
 	Author = {Fuentes, Montserrat},
 	Date-Added = {2014-10-24 20:09:55 +0000},
@@ -111,14 +254,14 @@
 	Number = {1},
 	Pages = {30--54},
 	Publisher = {Elsevier},
-	Title = {A formal test for nonstationarity of spatial stochastic processes},
+	Title = {A Formal Test for Nonstationarity of Spatial Stochastic Processes},
 	Volume = {96},
 	Year = {2005}}
 	
 @article{fuentes2006testing,
   title={Testing for separability of spatial--temporal covariance functions},
   author={Fuentes, Montserrat},
-  journal={Journal of statistical planning and inference},
+  journal={Journal of Statistical Planning and Inference},
   volume={136},
   number={2},
   pages={447--466},
@@ -138,7 +281,7 @@
 }
 
 @article{fuentes2010spectral,
-  title={Spectral domain},
+  title={Spectral Domain},
   author={Fuentes, Montserrat and Reich, Brian},
   journal={Handbook of Spatial Statistics},
   pages={57--77},
@@ -154,8 +297,16 @@
   publisher={Wiley Online Library}
 }
 	
+	
+@article{vanhala2014frequency,
+  title={A frequency domain empirical likelihood for estimation and testing of spatial covariance structure},
+  author={Van Hala, Matthew and Bandyopadhyay, Soutir and Lahiri, Soumendra N and Nordman, Daniel J},
+  journal={preprint},
+  year={2014}
+}
+	
 @article{lu2001testing,
-  title={Testing for isotropy and other directional symmetry properties of spatial correlation},
+  title={Testing for Isotropy and Other Directional Symmetry Properties of Spatial Correlation},
   author={Lu, H and Zimmerman, DL},
   journal={preprint},
   year={2001}
@@ -167,32 +318,32 @@
 	Date-Added = {2014-10-24 20:09:07 +0000},
 	Date-Modified = {2014-10-24 20:09:17 +0000},
 	Publisher = {CRC Press},
-	Title = {Statistical methods for spatial data analysis},
+	Title = {Statistical Methods for Spatial Data Analysis},
 	Year = {2004}}
 
 @book{banerjee2004hierarchical,
-  title={Hierarchical modeling and analysis for spatial data},
+  title={Hierarchical Modeling and Analysis for Spatial Data},
   author={Banerjee, Sudipto and Gelfand, Alan E and Carlin, Bradley P},
   year={2004},
   publisher={CRC Press}
 }
 
 @book{banerjee2014hierarchical,
-  title={Hierarchical modeling and analysis for spatial data},
+  title={Hierarchical Modeling and Analysis for Spatial Data},
   author={Banerjee, Sudipto and Carlin, Bradley P and Gelfand, Alan E},
   year={2014},
   publisher={CRC Press}
 }
 
 @book{sherman2011spatial,
-  title={Spatial statistics and spatio-temporal data: covariance functions and directional properties},
+  title={Spatial Statistics and Spatio-Temporal Data: Covariance Functions and Directional Properties},
   author={Sherman, Michael},
   year={2011},
   publisher={John Wiley \& Sons}
 }
 
 @book{isaaks1989applied,
-  title={Applied geostatistics},
+  title={Applied Geostatistics},
   author={Isaaks, Edward H and Srivastava, R Mohan},
   volume={2},
   year={1989},
@@ -272,7 +423,7 @@
 }
 
 @article{higdon1998process,
-  title={A process-convolution approach to modelling temperatures in the North Atlantic Ocean},
+  title={A process-convolution approach to modeling temperatures in the North Atlantic Ocean},
   author={Higdon, David},
   journal={Environmental and Ecological Statistics},
   volume={5},
@@ -294,7 +445,7 @@
 }
 
 @article{ecker1999bayesian,
-  title={Bayesian modeling and inference for geometrically anisotropic spatial data},
+  title={Bayesian Modeling and Inference for Geometrically Anisotropic Spatial Data},
   author={Ecker, Mark D and Gelfand, Alan E},
   journal={Mathematical Geology},
   volume={31},
@@ -305,7 +456,7 @@
 }
 
 @article{ecker2003spatial,
-  title={Spatial modeling and prediction under stationary non-geometric range anisotropy},
+  title={Spatial Modeling and Prediction Under Stationary Non-Geometric Range Anisotropy},
   author={Ecker, Mark D and Gelfand, Alan E},
   journal={Environmental and Ecological Statistics},
   volume={10},
@@ -384,16 +535,21 @@
   publisher={Wiley Online Library}
 }
 
-%Test for NS
-@article{band2014test,
-  title={A test for stationarity for irregularly spaced spatial data},
-  author={Bandyopadhyay, Soutir and Rao, Suhasini Subba},
-  year={2014}
+
+@article{band2015frequency,
+  title={A frequency domain empirical likelihood method for irregularly spaced spatial data},
+  author={Bandyopadhyay, Soutir and Lahiri, Soumendra N and Nordman, Daniel J and others},
+  journal={The Annals of Statistics},
+  volume={43},
+  number={2},
+  pages={519--545},
+  year={2015},
+  publisher={Institute of Mathematical Statistics}
 }
 
 %Guan Section
 @article{guan2004isotropy,
-  title={A nonparametric test for spatial isotropy using subsampling},
+  title={A Nonparametric Test for Spatial Isotropy Using Subsampling},
   author={Guan, Yongtao and Sherman, Michael and Calvin, James A},
   journal={Journal of the American Statistical Association},
   volume={99},
@@ -402,11 +558,12 @@
   year={2004},
   publisher={Taylor \& Francis}
 }
-%Relax Poisson assumptoin
+
+%Guan, relax Poisson assumption
 @article{guan2007asymptotic,
-  title={On asymptotic properties of the mark variogram estimator of a marked point process},
+  title={On Asymptotic Properties of the Mark Variogram Estimator of a Marked Point Process},
   author={Guan, Yongtao and Sherman, Michael and Calvin, James A},
-  journal={Journal of statistical planning and inference},
+  journal={Journal of Statistical Planning and Inference},
   volume={137},
   number={1},
   pages={148--161},
@@ -421,6 +578,7 @@
   year={2003},
   school={Texas A\&M University}
 }
+
 
 %point process isotropy
 @article{guan2006assessing,
@@ -466,7 +624,7 @@
 }
 
 @article{jun2012test,
-  title={A test for stationarity of spatio-temporal random fields on planar and spherical domains},
+  title={A Test for Stationarity of Spatio-Temporal Random Fields on Planar and Spherical Domains},
   author={Jun, Mikyoung and Genton, Marc G},
   journal={Statistica Sinica},
   volume={22},
@@ -479,7 +637,7 @@
 @article{park2008testing,
   title={Testing lack of symmetry in spatial--temporal processes},
   author={Park, Man Sik and Fuentes, Montserrat},
-  journal={Journal of statistical planning and inference},
+  journal={Journal of Statistical Planning and Inference},
   volume={138},
   number={10},
   pages={2847--2866},
@@ -499,7 +657,7 @@
 }
 
 @article{lu2005test,
-  title={Testing for directional symmetry in spatial dependence using the periodogram},
+  title={Testing for Directional Symmetry in Spatial Dependence Using the Periodogram},
   author={Lu, Nelson and Zimmerman, Dale L},
   journal={Journal of Statistical Planning and Inference},
   volume={129},
@@ -589,9 +747,9 @@
 }
 
 @article{maity2012test,
-  title={Testing for spatial isotropy under general designs},
+  title={Testing for Spatial Isotropy Under General Designs},
   author={Maity, Arnab and Sherman, Michael},
-  journal={Journal of statistical planning and inference},
+  journal={Journal of Statistical Planning and Inference},
   volume={142},
   number={5},
   pages={1081--1091},
@@ -600,7 +758,7 @@
 }
 
 @article{zimmerman1993another,
-  title={Another look at anisotropy in geostatistics},
+  title={Another Look at Anisotropy in Geostatistics},
   author={Zimmerman, Dale L},
   journal={Mathematical Geology},
   volume={25},
@@ -666,7 +824,7 @@
 }
 
 @article{garcia2007asymptotic,
-  title={Asymptotic normality of the Nadaraya--Watson semivariogram estimators},
+  title={Asymptotic normality of the {N}adaraya--{W}atson semivariogram estimators},
   author={Garc{\'\i}a-Soid{\'a}n, Pilar},
   journal={Test},
   volume={16},
@@ -676,8 +834,20 @@
   publisher={Springer}
 }
 
+
+@article{sherman1994nonparametric,
+  title={Nonparametric Estimation of the Moments of a General Statistic Computed from Spatial Data},
+  author={Sherman, Michael and Carlstein, Edward},
+  journal={Journal of the American Statistical Association},
+  volume={89},
+  number={426},
+  pages={496--500},
+  year={1994},
+  publisher={Taylor \& Francis}
+}
+
 @article{hall1994properties,
-  title={Properties of nonparametric estimators of autocovariance for stationary random fields},
+  title={Properties of Nonparametric Estimators of Autocovariance for Stationary Random Fields},
   author={Hall, Peter and Patil, Prakash},
   journal={Probability Theory and Related Fields},
   volume={99},
@@ -753,14 +923,14 @@
 
 %Lahiri book
 @book{lahiri2003resampling,
-  title={Resampling methods for dependent data},
+  title={Resampling Methods for Dependent Data},
   author={Lahiri, Soumendra Nath},
   year={2003},
   publisher={Springer Science \& Business Media}
 }
 
 @article{lahiri2006resampling,
-  title={Resampling methods for spatial regression models under a class of stochastic designs},
+  title={Resampling Methods for Spatial Regression Models Under a Class of Stochastic Designs},
   author={Lahiri, SN and Zhu, Jun},
   journal={The Annals of Statistics},
   volume={34},
@@ -779,7 +949,7 @@
 }
 
 @phdthesis{lu1994distributions,
-  title={On the distributions of the sample covariogram and semivariogram and their use in testing for isotropy},
+  title={On the Distributions of the Sample Covariogram and Semivariogram and Their Use in Testing for Isotropy},
   author={Lu, Hsiao-Chuan},
   year={1994},
   school={University of Iowa}
@@ -877,7 +1047,7 @@
 
 %Matheron section
 @inproceedings{matheron1961precision,
-  title={Precision of exploring a stratified formation by boreholes with rigid spacing-application to a bauxite deposit},
+  title={Precision of Exploring a Stratified Formation by Boreholes with Rigid Spacing-Application to a Bauxite Deposit},
   author={Matheron, G},
   booktitle={International Symposium of Mining Research, University of Missouri},
   volume={1},
@@ -886,7 +1056,7 @@
 }
 
 @book{matheron1962traite,
-  title={Trait{\'e} de g{\'e}ostatistique appliqu{\'e}e},
+  title={Trait{\'e} de G{\'e}ostatistique Appliqu{\'e}e},
   author={Matheron, Georges},
   year={1962},
   publisher={Editions Technip}
@@ -1031,21 +1201,24 @@
   publisher={JSTOR}
 }
 
-%%%%%%%%
-@Manual{rsoftware,
-    title = {R: A Language and Environment for Statistical Computing},
-    author = {{R Core Team}},
-    organization = {R Foundation for Statistical Computing},
-    address = {Vienna, Austria},
-    year = {2014},
-    url = {http://www.R-project.org/},
-  }
+@article{watson1964smooth,
+  title={Smooth regression analysis},
+  author={Watson, Geoffrey S},
+  journal={Sankhy{\=a}: The Indian Journal of Statistics, Series A},
+  pages={359--372},
+  year={1964},
+  publisher={JSTOR}
+}
 
- @Manual{smpackage,
-    title = {{R} package \texttt{sm}: nonparametric smoothing methods (version 2.2-5.4)},
-    author = {A. W. Bowman and A. Azzalini},
-    address = {University of Glasgow, UK and Universit\`a di Padova, Italia},
-    year = {2014},
-    url = {URL http://www.stats.gla.ac.uk/~adrian/sm, http://azzalini.stat.unipd.it/Book_sm}
-    }
+@article{nadaraya1964estimating,
+  title={On estimating regression},
+  author={Nadaraya, Elizbar A},
+  journal={Theory of Probability \& Its Applications},
+  volume={9},
+  number={1},
+  pages={141--142},
+  year={1964},
+  publisher={SIAM}
+}
+
 

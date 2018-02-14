@@ -1,6 +1,7 @@
 importFrom("stats", "cov", "dnorm", "integrate", "pchisq", "rf", "sd")
 importFrom("methods", "new", "setMethod", "setClass")
 importFrom("sp", "coordinates")
+importFrom("geoR", "coords.aniso")
 export(GuanTestGrid)
 export(GuanTestUnif)
 export(LuTest)

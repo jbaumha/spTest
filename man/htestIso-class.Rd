@@ -2,8 +2,8 @@
 % Please edit documentation in R/htestIso_class.R
 \docType{class}
 \name{htestIso-class}
-\alias{htestIso}
 \alias{htestIso-class}
+\alias{htestIso}
 \title{An S4 class to hold output from a hypothesis test of isotropy. Extends the S3 class 'htest'.}
 \description{
 An S4 class to hold output from a hypothesis test of isotropy. Extends the S3 class 'htest'.

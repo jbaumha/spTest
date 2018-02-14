@@ -1,0 +1,15 @@
+bibentry(bibtype = "Article",
+  title        = "{spTest}: An {R} Package Implementing Nonparametric Tests of Isotropy",
+  author       = person(given = c("Zachary", "D."),
+                        family = "Weller",
+                        email = "wellerz@stat.colostate.edu"),
+  journal      = "Journal of Statistical Software",
+  year         = "2018",
+  volume       = "83",
+  number       = "4",
+  pages        = "1--24",
+  doi          = "10.18637/jss.v083.i04",
+
+  header       = "To cite spTest in publications use:"
+)
+

@@ -5,6 +5,7 @@
 #'	\item Lu, N., & Zimmerman, D. L. (2005). Testing for directional symmetry in spatial dependence using the periodogram. \emph{Journal of Statistical Planning and Inference}, 129(1), 369-385.
 #' \item Guan, Y., Sherman, M., & Calvin, J. A. (2004). A nonparametric test for spatial isotropy using subsampling. \emph{Journal of the American Statistical Association}, 99(467), 810-821.
 #' \item Maity, A., & Sherman, M. (2012). Testing for spatial isotropy under general designs. \emph{Journal of Statistical Planning and Inference}, 142(5), 1081-1091.
+#' \item Weller, Z.D. (2018). spTest: An R Package Implementing Nonparametric Tests of Isotropy. \emph{Journal of Statistical Software}, 84(4), 1-24.
 #'	}
 
 #' @docType package

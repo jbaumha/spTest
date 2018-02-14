@@ -111,4 +111,3 @@ Guan, Y., Sherman, M., & Calvin, J. A. (2004). A nonparametric test for spatial 
 \code{\link{MaityTest}} \code{\link{GuanTestGrid}}
 }
 \keyword{external}
-

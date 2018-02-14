@@ -31,4 +31,3 @@ image.plot(WRFG$lon-360, WRFG$lat, WRFG$WRFG.NCEP.tas)
 world(add = TRUE)
 }
 \keyword{datasets}
-

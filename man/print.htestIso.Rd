@@ -53,4 +53,3 @@ print.htestIso(tr) #print the summary
 tr #can also print it using this command
 }
 \keyword{external}
-
