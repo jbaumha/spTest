@@ -80,15 +80,15 @@ GuanTestGrid = function(spdata, delta = 1, lagmat = rbind(c(1,0), c(0, 1), c(1, 
 {	
 	dname <- deparse(substitute(spdata))
 	spdata.class <- class(spdata)
-	if(spdata.class == "geodata")
+	if("geodata" %in% spdata.class)
 	{
 		spdata <- cbind(spdata$coords, spdata$data)
 	}
-	if(spdata.class == "SpatialGridDataFrame")
+	if("SpatialGridDataFrame" %in% spdata.class)
 	{
 		spdata <- cbind(coordinates(spdata), spdata[[1]])
 	}
-	if(spdata.class == "SpatialPixelsDataFrame")
+	if("SpatialPixelsDataFrame" %in% spdata.class)
 	{
 		delta.x <- summary(spdata)$grid[1,2]
 		delta.y <- summary(spdata)$grid[1,2]
