@@ -91,11 +91,11 @@ MaityTest = function(spdata, lagmat, A, df, xlims, ylims, grid.spacing = c(1,1),
 {
 	dname <- deparse(substitute(spdata))
 	spdata.class <- class(spdata)
-	if(spdata.class == "geodata")
+	if("geodata" %in% spdata.class)
 	{
 		spdata <- cbind(spdata$coords, spdata$data)
 	}
-	if(spdata.class == "SpatialPointsDataFrame")
+	if("SpatialPointsDataFrame" %in% spdata.class)
 	{
 		spdata <- cbind(coordinates(spdata), spdata[[1]])
 	}
