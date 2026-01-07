@@ -68,15 +68,15 @@ LuTest = function(spdata, nrows = 10, ncols = 10, test = "complete", nsim = 5000
 {
 	dname <- deparse(substitute(spdata))
 	spdata.class <- class(spdata)
-	if(spdata.class == "geodata")
+	if("geodata" %in% spdata.class)
 	{
 		spdata <- cbind(spdata$coords, spdata$data)
 	}
-	if(spdata.class == "SpatialGridDataFrame")
+	if("SpatialGridDataFrame" %in% spdata.class)
 	{
 		spdata <- cbind(coordinates(spdata), spdata[[1]])
 	}
-	if(spdata.class == "SpatialPixelsDataFrame")
+	if("SpatialPixelsDataFrame" %in% spdata.class)
 	{
 		spdata <- cbind(coordinates(spdata), spdata[[1]])
 		delta.x <- summary(spdata)$grid[1,2]
